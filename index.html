@@ -54,7 +54,7 @@
 
         .chatContainer {
             display: none; /* Masquer le conteneur de chat par défaut */
-            width: 30%; /* Largeur du conteneur de chat */
+            width: 25%; /* Largeur du conteneur de chat, ajusté pour être plus à gauche */
             margin-right: 20px; /* Espacement entre le chat et le conteneur principal */
             background-color: #f9f9f9; /* Couleur de fond pour le chat */
             padding: 10px;
@@ -71,7 +71,7 @@
         }
 
         .mainContainer {
-            width: 70%; /* Largeur du conteneur principal */
+            width: 75%; /* Largeur du conteneur principal */
             display: flex;
             flex-direction: column;
             height: 100%; /* Hauteur du conteneur principal */
@@ -244,7 +244,7 @@
                 const playerDocId = `Player${playerCount}`;
                 
                 await db.collection('Joueurs').doc(playerDocId).set({ username });
-                console.log(`Pseudo sauvegardé dans Firestore sous ${playerDocId} :`, username);
+                console.log(`Pseudo sauvegardé dans Firestore sous ${playerDocId}:`, username);
                 return username; // Retourne le pseudo sauvegardé
             } catch (error) {
                 console.error('Erreur lors de la sauvegarde du pseudo :', error);
@@ -287,11 +287,23 @@
 
             // Afficher le conteneur de chat
             document.querySelector('.chatContainer').style.display = 'flex'; // Affiche le chat
+
+            // Cacher le bouton "Hébergeur"
+            document.getElementById('hostBtn').style.display = 'none';
+            // Afficher le bouton "Joueur"
+            document.getElementById('playerBtn').style.display = 'inline-block';
         };
 
         document.getElementById('playerBtn').onclick = function() {
-            document.querySelector('.button-container').style.display = 'none';
+            // Cacher le bouton "Joueur"
+            document.getElementById('playerBtn').style.display = 'none';
+            // Afficher le bouton "Hébergeur"
+            document.getElementById('hostBtn').style.display = 'inline-block';
+
+            // Cacher tout sauf le conteneur pour le code
             document.getElementById('playerContainer').style.display = 'block';
+            // Cacher le conteneur de chat
+            document.querySelector('.chatContainer').style.display = 'none';
         };
 
         document.getElementById('confirmBtn').onclick = async function() {
@@ -314,7 +326,7 @@
                 // Cacher tout sauf la liste des joueurs
                 document.querySelector('.container').innerHTML = ""; // Vide le conteneur
                 const playersListContainer = document.createElement('div');
-                playersListContainer.innerHTML = `<h3>Joueurs :</h3> <!-- Titre modifié ici -->
+                playersListContainer.innerHTML = `<h3>Joueurs :</h3>
                                                   <ul id="finalPlayersList">
                                                       <li><strong>${savedUsername}</strong></li>
                                                   </ul>`;
