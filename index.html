@@ -40,18 +40,22 @@
             min-height: 100vh;
             font-family: Arial, sans-serif;
             background-color: #f0f0f5;
+            overflow: hidden;
+            position: relative;
         }
 
         .container {
+            position: relative;
             width: 100%;
             max-width: 600px;
             padding: 20px;
-            background-color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.9);
             box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            z-index: 2; /* S'assurer que la zone de contenu est au-dessus du fond */
         }
 
         h3 {
@@ -134,9 +138,33 @@
             color: #4CAF50; /* Change la couleur pour la rendre plus visible */
             text-align: center; /* Centre le code */
         }
+
+        /* Styles pour le fond en quadrillage */
+        .grid-background {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background-size: 50px 50px;
+            background-image: linear-gradient(to right, rgba(0,0,0,0.1) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(0,0,0,0.1) 1px, transparent 1px);
+            animation: move-background 30s linear infinite; /* Animation de mouvement */
+            z-index: 1; /* S'assurer que le fond est derrière le contenu */
+        }
+
+        @keyframes move-background {
+            0% { background-position: 0 0; }
+            100% { background-position: 50px 50px; }
+        }
+
+        #playersListContainer {
+            display: none; /* Masquer au départ */
+            margin-top: 20px; /* Espacement au-dessus de la liste des joueurs */
+        }
     </style>
 </head>
 <body>
+
+    <div class="grid-background"></div> <!-- Ajout du fond en quadrillage -->
 
     <div class="container">
         <div class="button-container">
@@ -213,44 +241,48 @@
                 
                 await db.collection('Joueurs').doc(playerDocId).set({ username });
                 console.log(`Pseudo sauvegardé dans Firestore sous ${playerDocId} :`, username);
+                
+                // Afficher la liste des joueurs après l'enregistrement du pseudo
+                displayPlayersList(); // Met à jour la liste des joueurs
             } catch (error) {
                 console.error('Erreur lors de la sauvegarde du pseudo :', error);
             }
         }
 
-        // Affiche la liste des joueurs en temps réel
-        function displayPlayersList() {
-            const playersListContainer = document.getElementById('playersList');
-            playersListContainer.innerHTML = ""; // Réinitialise la liste
+        // Affichage de la liste des joueurs
+        async function displayPlayersList() {
+            const playersList = document.getElementById('playersList');
+            playersList.innerHTML = ''; // Réinitialise la liste
 
-            // Met en place un écouteur sur la collection "Joueurs"
-            db.collection('Joueurs').onSnapshot(snapshot => {
-                playersListContainer.innerHTML = ""; // Efface la liste actuelle
-                snapshot.forEach(doc => {
-                    const player = doc.data().username;
-                    const li = document.createElement('li');
-                    li.textContent = player;
-                    playersListContainer.appendChild(li);
-                });
+            const playersSnapshot = await db.collection('Joueurs').get();
+            playersSnapshot.forEach(doc => {
+                const li = document.createElement('li');
+                li.textContent = doc.data().username;
+                playersList.appendChild(li);
             });
+
+            // Affiche le conteneur de la liste des joueurs
+            document.getElementById('playersListContainer').style.display = playersSnapshot.size > 0 ? 'block' : 'none';
         }
 
-        // Gestion des clics de boutons
+        // Gestionnaire d'événements pour le bouton Hébergeur
         document.getElementById('hostBtn').onclick = async function() {
-            document.querySelector('.button-container').style.display = 'none';
             const code = generateRandomCode();
             document.getElementById('hostCode').textContent = code;
             document.getElementById('codeContainer').style.display = 'block';
+            document.getElementById('button-container').style.display = 'none';
 
+            // Sauvegarde le code dans Firestore
             await saveCodeToFirestore(code);
         };
 
+        // Gestionnaire d'événements pour le bouton Joueur
         document.getElementById('playerBtn').onclick = function() {
-            document.querySelector('.button-container').style.display = 'none';
             document.getElementById('playerContainer').style.display = 'block';
+            document.getElementById('button-container').style.display = 'none';
         };
 
-        // Vérification du code entré
+        // Vérification du code
         document.getElementById('confirmBtn').onclick = async function() {
             const enteredCode = document.getElementById('playerCode').value;
             const errorMsg = document.getElementById('errorMsg');
