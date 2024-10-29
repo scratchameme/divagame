@@ -166,7 +166,7 @@
         </div>
 
         <div id="finalPlayersListContainer" style="display: none;">
-            <h3>Joueurs :</h3>
+            <h3>Joueurs :</h3> <!-- Titre modifié ici -->
             <ul id="finalPlayersList"></ul> <!-- Nouvelle liste pour afficher les joueurs -->
         </div>
     </div>
@@ -252,11 +252,11 @@
 
         // Gestion des clics de boutons
         document.getElementById('hostBtn').onclick = async function() {
-            document.querySelector('.button-container').style.display = 'none';
             const code = generateRandomCode();
             document.getElementById('hostCode').textContent = code;
             await saveCodeToFirestore(code);
             document.getElementById('codeContainer').style.display = 'block';
+            displayPlayersList(); // Affiche la liste des joueurs
         };
 
         document.getElementById('playerBtn').onclick = function() {
@@ -284,7 +284,7 @@
                 // Cacher tout sauf la liste des joueurs
                 document.querySelector('.container').innerHTML = ""; // Vide le conteneur
                 const playersListContainer = document.createElement('div');
-                playersListContainer.innerHTML = `<h3>Joueurs connectés :</h3>
+                playersListContainer.innerHTML = `<h3>Joueurs :</h3> <!-- Titre modifié ici -->
                                                   <ul id="finalPlayersList">
                                                       <li><strong>${savedUsername}</strong></li>
                                                   </ul>`;
