@@ -90,9 +90,23 @@
             return code;
         }
 
+        // Fonction pour supprimer tous les documents de la collection "Joueurs"
+        async function clearPlayersCollection() {
+            const playersSnapshot = await db.collection('Joueurs').get();
+            const batch = db.batch();
+            playersSnapshot.forEach(doc => {
+                batch.delete(doc.ref);
+            });
+            await batch.commit();
+            console.log('Tous les documents de la collection "Joueurs" ont été supprimés.');
+        }
+
         // Fonction pour sauvegarder le code dans Firestore en utilisant un document unique
         async function saveCodeToFirestore(code) {
             try {
+                // Supprime tous les joueurs avant de sauvegarder un nouveau code
+                await clearPlayersCollection();
+
                 await db.collection('hostCodes').doc('codes').set({ code });
                 console.log('Code sauvegardé dans Firestore :', code);
             } catch (error) {
