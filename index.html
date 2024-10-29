@@ -43,23 +43,15 @@
         }
 
         .container {
-            display: flex; /* Changement ici pour utiliser Flexbox */
-            flex-direction: row; /* Disposition en ligne */
             width: 100%;
-            max-width: 800px; /* Largeur maximale de la conteneur */
+            max-width: 600px;
             padding: 20px;
             background-color: #ffffff;
             box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
-        }
-
-        .chat-container {
-            width: 150px; /* Réduire la largeur du conteneur de chat */
-            margin-right: 20px; /* Espace entre le chat et le reste */
-        }
-
-        .main-container {
-            flex-grow: 1; /* Prend tout l'espace restant */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         h3 {
@@ -93,7 +85,7 @@
 
         #codeContainer, #playerContainer, #usernameContainer {
             display: none;
-            font-size: 1.5em; /* Augmenter la taille de police pour le code et joueurs */
+            font-size: 1.2em;
             margin-top: 20px;
             width: 100%;
         }
@@ -142,70 +134,40 @@
             color: #4CAF50; /* Change la couleur pour la rendre plus visible */
             text-align: center; /* Centre le code */
         }
-
-        /* Style pour le chat */
-        #chatContainer {
-            display: none; /* Cacher le chat par défaut */
-            width: 150px; /* Réduire encore la largeur du chat */
-            padding: 15px;
-            background-color: #f0f0f5; /* Couleur de fond gris */
-            border: 1px solid #ccc; /* Bordure grise */
-            border-radius: 5px;
-            text-align: center; /* Centre le texte du chat */
-        }
-
-        /* Style pour afficher le nom du joueur */
-        #finalPlayersListContainer {
-            display: none; /* Initialement caché */
-            text-align: center; /* Centrer le texte */
-        }
-
-        #finalPlayersList {
-            font-size: 3em; /* Taille de police plus grande pour le nom du joueur */
-            font-weight: bold; /* Met le texte en gras */
-            color: #333; /* Couleur du texte */
-        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="chat-container" id="chatContainer">
-            <h3>Chat</h3> <!-- Titre du chat -->
-            <p>Le chat apparaîtra ici.</p> <!-- Texte de l'espace de chat -->
+        <div class="button-container">
+            <button id="hostBtn">Hébergeur</button>
+            <button id="playerBtn">Joueur</button>
         </div>
 
-        <div class="main-container">
-            <div class="button-container">
-                <button id="hostBtn">Hébergeur</button>
-                <button id="playerBtn">Joueur</button>
+        <div id="codeContainer">
+            <p>Code : <strong><span id="hostCode"></span></strong></p>
+            <div id="playersListContainer">
+                <h3>Joueurs connectés :</h3>
+                <ul id="playersList"></ul>
             </div>
+        </div>
 
-            <div id="codeContainer">
-                <p>Code : <strong><span id="hostCode"></span></strong></p>
-                <div id="playersListContainer">
-                    <h3>Joueurs connectés :</h3>
-                    <ul id="playersList"></ul>
-                </div>
-            </div>
+        <div id="playerContainer">
+            <label for="playerCode">Code :</label>
+            <input type="text" id="playerCode" placeholder="Entrez le code">
+            <button id="confirmBtn">Confirmer</button>
+            <p id="errorMsg"></p>
+        </div>
 
-            <div id="playerContainer">
-                <label for="playerCode">Code :</label>
-                <input type="text" id="playerCode" placeholder="Entrez le code">
-                <button id="confirmBtn">Confirmer</button>
-                <p id="errorMsg"></p>
-            </div>
+        <div id="usernameContainer">
+            <label for="username">Pseudo :</label>
+            <input type="text" id="username" placeholder="Entrez votre pseudo">
+            <button id="submitUsernameBtn">Confirmer</button>
+        </div>
 
-            <div id="usernameContainer">
-                <label for="username">Pseudo :</label>
-                <input type="text" id="username" placeholder="Entrez votre pseudo">
-                <button id="submitUsernameBtn">Confirmer</button>
-            </div>
-
-            <div id="finalPlayersListContainer">
-                <h3>Nom du joueur :</h3> <!-- Modifié ici -->
-                <ul id="finalPlayersList"></ul> <!-- Nouvelle liste pour afficher les joueurs -->
-            </div>
+        <div id="finalPlayersListContainer" style="display: none;">
+            <h3>Joueurs :</h3> <!-- Titre modifié ici -->
+            <ul id="finalPlayersList"></ul> <!-- Nouvelle liste pour afficher les joueurs -->
         </div>
     </div>
 
@@ -255,47 +217,49 @@
                 const playerDocId = `Player${playerCount}`;
                 
                 await db.collection('Joueurs').doc(playerDocId).set({ username });
-                console.log('Pseudo sauvegardé dans Firestore :', username);
-                
-                return username; // Retourne le pseudo sauvegardé
+                console.log(`Pseudo sauvegardé dans Firestore sous ${playerDocId} :`, username);
+                return username; // Retourne le pseudo pour l'affichage
             } catch (error) {
-                console.error('Erreur lors de la sauvegarde du pseudo:', error);
+                console.error('Erreur lors de la sauvegarde du pseudo :', error);
             }
         }
 
-        // Fonction pour afficher la liste des joueurs
+        // Affiche la liste des joueurs en temps réel
         function displayPlayersList() {
             const playersListContainer = document.getElementById('playersList');
-            playersListContainer.innerHTML = ''; // Vide la liste des joueurs
+            playersListContainer.innerHTML = ""; // Réinitialise la liste
 
-            db.collection('Joueurs').onSnapshot((snapshot) => {
+            // Met en place un écouteur sur la collection "Joueurs"
+            db.collection('Joueurs').onSnapshot(snapshot => {
+                playersListContainer.innerHTML = ""; // Efface la liste actuelle
                 snapshot.forEach(doc => {
+                    const player = doc.data().username;
                     const li = document.createElement('li');
-                    li.textContent = doc.data().username; // Obtient le pseudo
+                    li.textContent = player;
                     playersListContainer.appendChild(li);
                 });
             });
         }
 
-        // Fonction pour vérifier le code d'hôte
+        // Vérifier le code de l'hébergeur
         async function verifyHostCode(code) {
             const doc = await db.collection('hostCodes').doc('codes').get();
-            return doc.exists && doc.data().code === code;
+            if (doc.exists) {
+                return doc.data().code === code;
+            }
+            return false;
         }
 
-        // Événements de clic sur les boutons
-        document.getElementById('hostBtn').onclick = function() {
-            // Génère et affiche un code pour l'hébergeur
-            const hostCode = generateRandomCode();
-            document.getElementById('hostCode').textContent = hostCode;
-            saveCodeToFirestore(hostCode);
-            
-            // Cacher les boutons et afficher le conteneur de code
-            document.querySelector('.button-container').style.display = 'none';
+        // Gestion des clics de boutons
+        document.getElementById('hostBtn').onclick = async function() {
+            const code = generateRandomCode();
+            document.getElementById('hostCode').textContent = code;
+            await saveCodeToFirestore(code);
             document.getElementById('codeContainer').style.display = 'block';
-
-            // Affiche le conteneur de chat
-            document.getElementById('chatContainer').style.display = 'block'; // Affiche le conteneur de chat
+            
+            // Cacher les boutons "Hébergeur" et "Joueur"
+            document.querySelector('.button-container').style.display = 'none';
+            displayPlayersList(); // Affiche la liste des joueurs
         };
 
         document.getElementById('playerBtn').onclick = function() {
@@ -322,13 +286,12 @@
 
                 // Cacher tout sauf la liste des joueurs
                 document.querySelector('.container').innerHTML = ""; // Vide le conteneur
-                const finalPlayersListContainer = document.createElement('div');
-                finalPlayersListContainer.id = 'finalPlayersListContainer';
-                finalPlayersListContainer.innerHTML = `<h3>Nom du joueur :</h3>
-                                                      <ul id="finalPlayersList">
-                                                          <li><strong>${savedUsername}</strong></li>
-                                                      </ul>`;
-                document.querySelector('.container').appendChild(finalPlayersListContainer);
+                const playersListContainer = document.createElement('div');
+                playersListContainer.innerHTML = `<h3>Joueurs :</h3>
+                                                  <ul id="finalPlayersList">
+                                                      <li><strong>${savedUsername}</strong></li>
+                                                  </ul>`;
+                document.querySelector('.container').appendChild(playersListContainer);
                 
                 // Affiche la liste des autres joueurs
                 displayPlayersList();
