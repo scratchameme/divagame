@@ -44,7 +44,7 @@
 
         .container {
             width: 100%;
-            max-width: 600px;
+            max-width: 800px; /* Augmenter la largeur pour le chat */
             padding: 20px;
             background-color: #ffffff;
             box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
@@ -112,6 +112,34 @@
             margin-bottom: 15px;
         }
 
+        /* Styles pour le chat */
+        #chatContainer {
+            width: 100%; 
+            max-width: 350px; /* Largeur fixe pour le chat */
+            height: 400px; /* Hauteur du chat */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            overflow-y: auto; /* Scroll si le contenu déborde */
+            background-color: #f9f9f9;
+            margin-right: 20px; /* Espace à droite du chat */
+            display: flex;
+            flex-direction: column;
+        }
+
+        #chatMessages {
+            flex-grow: 1; /* Permet à la zone de message de prendre l'espace disponible */
+            overflow-y: auto; /* Permet de faire défiler les messages */
+        }
+
+        #messageInput {
+            width: 100%;
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
         ul {
             list-style-type: none;
             padding: 0;
@@ -149,6 +177,13 @@
             <div id="playersListContainer">
                 <h3>Joueurs connectés :</h3>
                 <ul id="playersList"></ul>
+            </div>
+            <div style="display: flex; align-items: flex-start;"> <!-- Flexbox pour aligner le chat et la liste -->
+                <div id="chatContainer">
+                    <div id="chatMessages"></div> <!-- Zone pour les messages -->
+                    <input type="text" id="messageInput" placeholder="Tapez votre message ici...">
+                    <button id="sendMessageBtn">Envoyer</button>
+                </div>
             </div>
         </div>
 
@@ -212,45 +247,63 @@
         // Fonction pour sauvegarder le pseudo dans la collection "Joueurs" avec nom incrémenté
         async function saveUsernameToFirestore(username) {
             try {
-                const playersSnapshot = await db.collection('Joueurs').get();
-                const playerCount = playersSnapshot.size + 1;
-                const playerDocId = `Player${playerCount}`;
-                
-                await db.collection('Joueurs').doc(playerDocId).set({ username });
-                console.log(`Pseudo sauvegardé dans Firestore sous ${playerDocId} :`, username);
-                return username; // Retourne le pseudo pour l'affichage
+                const playerRef = await db.collection('Joueurs').add({ username });
+                console.log('Pseudo sauvegardé :', username);
+                return username; // Retourne le pseudo sauvegardé
             } catch (error) {
-                console.error('Erreur lors de la sauvegarde du pseudo :', error);
+                console.error('Erreur lors de la sauvegarde du pseudo:', error);
             }
         }
 
-        // Affiche la liste des joueurs en temps réel
-        function displayPlayersList() {
-            const playersListContainer = document.getElementById('playersList');
-            playersListContainer.innerHTML = ""; // Réinitialise la liste
+        // Fonction pour afficher la liste des joueurs
+        async function displayPlayersList() {
+            const playersSnapshot = await db.collection('Joueurs').get();
+            const playersList = document.getElementById('playersList');
+            const finalPlayersList = document.getElementById('finalPlayersList');
 
-            // Met en place un écouteur sur la collection "Joueurs"
-            db.collection('Joueurs').onSnapshot(snapshot => {
-                playersListContainer.innerHTML = ""; // Efface la liste actuelle
-                snapshot.forEach(doc => {
-                    const player = doc.data().username;
-                    const li = document.createElement('li');
-                    li.textContent = player;
-                    playersListContainer.appendChild(li);
-                });
+            playersList.innerHTML = '';
+            finalPlayersList.innerHTML = '';
+
+            playersSnapshot.forEach(doc => {
+                const data = doc.data();
+                const li = document.createElement('li');
+                li.textContent = data.username;
+                playersList.appendChild(li);
+                finalPlayersList.appendChild(li.cloneNode(true)); // Clone pour la liste finale
             });
+
+            // Affiche la liste des joueurs finaux si l'utilisateur est connecté
+            const finalPlayersListContainer = document.getElementById('finalPlayersListContainer');
+            if (finalPlayersList.children.length > 0) {
+                finalPlayersListContainer.style.display = 'block';
+            } else {
+                finalPlayersListContainer.style.display = 'none';
+            }
         }
 
-        // Vérifier le code de l'hébergeur
+        // Fonction pour vérifier si le code de l'hébergeur est valide
         async function verifyHostCode(code) {
             const doc = await db.collection('hostCodes').doc('codes').get();
-            if (doc.exists) {
-                return doc.data().code === code;
-            }
-            return false;
+            return doc.exists && doc.data().code === code;
         }
 
-        // Gestion des clics de boutons
+        // Fonction pour envoyer un message dans le chat
+        document.getElementById('sendMessageBtn').onclick = async function() {
+            const messageInput = document.getElementById('messageInput');
+            const messageText = messageInput.value;
+            if (messageText) {
+                // Affichage du message dans la zone de chat
+                const messageDiv = document.createElement('div');
+                messageDiv.textContent = messageText;
+                document.getElementById('chatMessages').appendChild(messageDiv);
+                
+                // Optionnel : Vous pouvez également ajouter du code pour stocker les messages dans Firestore ici
+                
+                // Réinitialiser le champ de saisie
+                messageInput.value = '';
+            }
+        };
+
         document.getElementById('hostBtn').onclick = async function() {
             const code = generateRandomCode();
             document.getElementById('hostCode').textContent = code;
