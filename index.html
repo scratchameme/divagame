@@ -43,15 +43,28 @@
         }
 
         .container {
+            display: flex; /* Changement ici pour utiliser Flexbox */
             width: 100%;
-            max-width: 600px;
+            max-width: 800px; /* Largeur maximale de la conteneur */
             padding: 20px;
             background-color: #ffffff;
             box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        }
+
+        .chat-container {
+            width: 200px; /* Largeur fixée du conteneur de chat */
+            height: 350px; /* Hauteur fixée du conteneur de chat */
+            margin-right: 20px; /* Espace entre le chat et le reste */
+            border: 1px solid #ccc; /* Bordure grise */
+            border-radius: 5px;
+            padding: 10px; /* Espacement intérieur */
+            overflow-y: auto; /* Permet de faire défiler le contenu */
+            background-color: #f0f0f5; /* Couleur de fond du chat */
+        }
+
+        .main-container {
+            flex-grow: 1; /* Prend tout l'espace restant */
         }
 
         h3 {
@@ -85,7 +98,7 @@
 
         #codeContainer, #playerContainer, #usernameContainer {
             display: none;
-            font-size: 1.2em;
+            font-size: 1.5em; /* Augmenter la taille de police pour le code et joueurs */
             margin-top: 20px;
             width: 100%;
         }
@@ -135,57 +148,58 @@
             text-align: center; /* Centre le code */
         }
 
-        /* Style pour le chat */
-        #chatContainer {
-            display: none; /* Cacher le chat par défaut */
-            width: 100%;
-            max-width: 300px;
-            padding: 15px;
-            background-color: #f0f0f5; /* Couleur de fond gris */
-            border: 1px solid #ccc; /* Bordure grise */
-            border-radius: 5px;
-            margin-top: 20px;
-            text-align: center;
+        /* Style pour afficher le nom du joueur */
+        #finalPlayersListContainer {
+            display: none; /* Initialement caché */
+            text-align: center; /* Centrer le texte */
+        }
+
+        #finalPlayersList {
+            font-size: 3em; /* Taille de police plus grande pour le nom du joueur */
+            font-weight: bold; /* Met le texte en gras */
+            color: #333; /* Couleur du texte */
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="button-container">
-            <button id="hostBtn">Hébergeur</button>
-            <button id="playerBtn">Joueur</button>
-        </div>
-
-        <div id="codeContainer">
-            <p>Code : <strong><span id="hostCode"></span></strong></p>
-            <div id="playersListContainer">
-                <h3>Joueurs connectés :</h3>
-                <ul id="playersList"></ul>
-            </div>
-        </div>
-
-        <div id="playerContainer">
-            <label for="playerCode">Code :</label>
-            <input type="text" id="playerCode" placeholder="Entrez le code">
-            <button id="confirmBtn">Confirmer</button>
-            <p id="errorMsg"></p>
-        </div>
-
-        <div id="usernameContainer">
-            <label for="username">Pseudo :</label>
-            <input type="text" id="username" placeholder="Entrez votre pseudo">
-            <button id="submitUsernameBtn">Confirmer</button>
-        </div>
-
-        <div id="finalPlayersListContainer" style="display: none;">
-            <h3>Nom du joueur :</h3> <!-- Modifié ici -->
-            <ul id="finalPlayersList"></ul> <!-- Nouvelle liste pour afficher les joueurs -->
-        </div>
-
-        <div id="chatContainer">
+        <div class="chat-container" id="chatContainer">
             <h3>Chat</h3> <!-- Titre du chat -->
             <p>Le chat apparaîtra ici.</p> <!-- Texte de l'espace de chat -->
+        </div>
+
+        <div class="main-container">
+            <div class="button-container">
+                <button id="hostBtn">Hébergeur</button>
+                <button id="playerBtn">Joueur</button>
+            </div>
+
+            <div id="codeContainer">
+                <p>Code : <strong><span id="hostCode"></span></strong></p>
+                <div id="playersListContainer">
+                    <h3>Joueurs connectés :</h3>
+                    <ul id="playersList"></ul>
+                </div>
+            </div>
+
+            <div id="playerContainer">
+                <label for="playerCode">Code :</label>
+                <input type="text" id="playerCode" placeholder="Entrez le code">
+                <button id="confirmBtn">Confirmer</button>
+                <p id="errorMsg"></p>
+            </div>
+
+            <div id="usernameContainer">
+                <label for="username">Pseudo :</label>
+                <input type="text" id="username" placeholder="Entrez votre pseudo">
+                <button id="submitUsernameBtn">Confirmer</button>
+            </div>
+
+            <div id="finalPlayersListContainer">
+                <h3>Nom du joueur :</h3> <!-- Modifié ici -->
+                <ul id="finalPlayersList"></ul> <!-- Nouvelle liste pour afficher les joueurs -->
+            </div>
         </div>
     </div>
 
@@ -235,25 +249,23 @@
                 const playerDocId = `Player${playerCount}`;
                 
                 await db.collection('Joueurs').doc(playerDocId).set({ username });
-                console.log(`Pseudo sauvegardé dans Firestore sous ${playerDocId} :`, username);
-                return username; // Retourne le pseudo pour l'affichage
+                console.log('Pseudo sauvegardé dans Firestore :', username);
+                
+                return username; // Retourne le pseudo sauvegardé
             } catch (error) {
-                console.error('Erreur lors de la sauvegarde du pseudo :', error);
+                console.error('Erreur lors de la sauvegarde du pseudo:', error);
             }
         }
 
-        // Affiche la liste des joueurs en temps réel
+        // Fonction pour afficher la liste des joueurs
         function displayPlayersList() {
             const playersListContainer = document.getElementById('playersList');
-            playersListContainer.innerHTML = ""; // Réinitialise la liste
+            playersListContainer.innerHTML = ''; // Vide la liste des joueurs
 
-            // Met en place un écouteur sur la collection "Joueurs"
-            db.collection('Joueurs').onSnapshot(snapshot => {
-                playersListContainer.innerHTML = ""; // Efface la liste actuelle
+            db.collection('Joueurs').onSnapshot((snapshot) => {
                 snapshot.forEach(doc => {
-                    const player = doc.data().username;
                     const li = document.createElement('li');
-                    li.textContent = player;
+                    li.textContent = doc.data().username; // Obtient le pseudo
                     playersListContainer.appendChild(li);
                 });
             });
@@ -304,12 +316,13 @@
 
                 // Cacher tout sauf la liste des joueurs
                 document.querySelector('.container').innerHTML = ""; // Vide le conteneur
-                const playersListContainer = document.createElement('div');
-                playersListContainer.innerHTML = `<h3>Nom du joueur :</h3>
-                                                  <ul id="finalPlayersList">
-                                                      <li><strong>${savedUsername}</strong></li>
-                                                  </ul>`;
-                document.querySelector('.container').appendChild(playersListContainer);
+                const finalPlayersListContainer = document.createElement('div');
+                finalPlayersListContainer.id = 'finalPlayersListContainer';
+                finalPlayersListContainer.innerHTML = `<h3>Nom du joueur :</h3>
+                                                      <ul id="finalPlayersList">
+                                                          <li><strong>${savedUsername}</strong></li>
+                                                      </ul>`;
+                document.querySelector('.container').appendChild(finalPlayersListContainer);
                 
                 // Affiche la liste des autres joueurs
                 displayPlayersList();
