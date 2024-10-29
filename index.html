@@ -258,7 +258,7 @@
             }
         }
 
-        // Fonction pour afficher les joueurs connectés dans la liste
+        // Fonction pour afficher la liste des joueurs
         async function displayPlayersList() {
             const playersList = document.getElementById('playersList');
             playersList.innerHTML = ''; // Réinitialiser la liste avant d'ajouter
@@ -280,10 +280,16 @@
             document.getElementById('codeContainer').style.display = 'block';
             document.getElementById('chatContainer').style.display = 'block'; // Afficher le chat
             await saveCodeToFirestore(code);
+
+            // Cacher les boutons
+            document.querySelector('.button-container').style.display = 'none';
         });
 
         document.getElementById('playerBtn').addEventListener('click', () => {
             document.getElementById('playerContainer').style.display = 'block';
+
+            // Cacher les boutons
+            document.querySelector('.button-container').style.display = 'none';
         });
 
         document.getElementById('confirmBtn').addEventListener('click', async () => {
@@ -293,6 +299,7 @@
 
             if (playerCode === savedCode) {
                 document.getElementById('usernameContainer').style.display = 'block';
+                document.getElementById('playerContainer').style.display = 'none'; // Cacher le conteneur de code
                 document.getElementById('errorMsg').textContent = '';
             } else {
                 document.getElementById('errorMsg').textContent = 'Code incorrect, veuillez réessayer.';
@@ -312,6 +319,9 @@
                     li.textContent = savedUsername; // Affiche le pseudo confirmé
                     finalPlayersList.appendChild(li);
                     finalPlayersListContainer.style.display = 'block'; // Afficher la liste des joueurs
+
+                    // Cacher le conteneur de pseudo
+                    document.getElementById('usernameContainer').style.display = 'none';
                 }
             }
         });
