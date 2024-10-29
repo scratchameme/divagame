@@ -1,70 +1,99 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Test Firebase Firestore</title>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
-    input, button, textarea { font-size: 18px; padding: 10px; margin-top: 10px; }
-    h2 { color: #333; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boutons Hébergeur & Joueur</title>
+    <!-- Ajoutez votre configuration Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+    <script>
+        // Initialisez Firebase ici avec vos informations de configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyDejZmhxJ-wjwJ3-nE2I43vMmhRqgqhcxA",
+          authDomain: "divagame-97e7c.firebaseapp.com",
+          projectId: "divagame-97e7c",
+          storageBucket: "divagame-97e7c.appspot.com",
+          messagingSenderId: "253959990116",
+          appId: "1:253959990116:web:506a1d0cdf752823656871"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
+    <style>
+        /* Styles de base */
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        .button-container, #codeContainer {
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #codeContainer {
+            display: none;
+            font-size: 24px;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Test de Connexion Firestore</h1>
-  
-  <h2 id="result">Résultat :</h2>
 
-  <textarea id="textInput" rows="4" cols="50" placeholder="Écrivez ici..."></textarea><br>
-  <button onclick="updateText()">Mettre à jour le texte</button>
+    <div class="button-container">
+        <button id="hostBtn">Hébergeur</button>
+        <button id="playerBtn">Joueur</button>
+    </div>
 
-  <h2>Texte affiché : <span id="displayText">Texte vide</span></h2>
+    <div id="codeContainer">
+        <p>Code d'hébergement : <span id="hostCode"></span></p>
+    </div>
 
-  <script>
-    // Configuration Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyDejZmhxJ-wjwJ3-nE2I43vMmhRqgqhcxA",
-      authDomain: "divagame-97e7c.firebaseapp.com",
-      projectId: "divagame-97e7c",
-      storageBucket: "divagame-97e7c.appspot.com",
-      messagingSenderId: "253959990116",
-      appId: "1:253959990116:web:506a1d0cdf752823656871"
-    };
-
-    // Initialiser Firebase et Firestore
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
-    // Écouter les mises à jour de texte en temps réel dès le chargement de la page
-    listenForTextUpdates();
-
-    // Fonction pour mettre à jour le texte
-    function updateText() {
-      const textInput = document.getElementById("textInput").value;
-      console.log("Texte à mettre à jour :", textInput); // Pour déboguer
-
-      db.collection("sharedText").doc("currentText").set({ text: textInput })
-        .then(() => {
-          console.log("Texte mis à jour avec succès !");
-        })
-        .catch((error) => {
-          console.error("Erreur lors de la mise à jour du texte :", error);
-        });
-    }
-
-    // Écouter les mises à jour de texte
-    function listenForTextUpdates() {
-      db.collection("sharedText").doc("currentText").onSnapshot((doc) => {
-        if (doc.exists) {
-          const data = doc.data();
-          console.log("Texte reçu de Firestore :", data.text); // Pour déboguer
-          document.getElementById("displayText").innerText = data.text || "Texte vide";
-        } else {
-          console.log("Aucun document trouvé !");
+    <script>
+        // Génération d'un code aléatoire de 6 caractères
+        function generateRandomCode() {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 6; i++) {
+                code += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return code;
         }
-      });
-    }
-  </script>
+
+        // Fonction pour sauvegarder le code dans Firestore
+        async function saveCodeToFirestore(code) {
+            try {
+                await db.collection('hostCodes').add({ code });
+                console.log('Code sauvegardé dans Firestore :', code);
+            } catch (error) {
+                console.error('Erreur lors de la sauvegarde du code:', error);
+            }
+        }
+
+        // Gestion des clics de boutons
+        document.getElementById('hostBtn').onclick = async function() {
+            // Cache les boutons et génère un code
+            document.querySelector('.button-container').style.display = 'none';
+            const code = generateRandomCode();
+            document.getElementById('hostCode').textContent = code;
+            document.getElementById('codeContainer').style.display = 'block';
+
+            // Sauvegarde le code dans Firestore
+            await saveCodeToFirestore(code);
+        };
+
+        document.getElementById('playerBtn').onclick = function() {
+            alert("Mode Joueur non implémenté");
+        };
+    </script>
+
 </body>
 </html>
