@@ -54,7 +54,7 @@
         }
 
         .chat-container {
-            width: 200px; /* Réduire la largeur du conteneur de chat */
+            width: 150px; /* Réduire la largeur du conteneur de chat */
             margin-right: 20px; /* Espace entre le chat et le reste */
         }
 
@@ -146,7 +146,7 @@
         /* Style pour le chat */
         #chatContainer {
             display: none; /* Cacher le chat par défaut */
-            width: 100%;
+            width: 150px; /* Réduire encore la largeur du chat */
             padding: 15px;
             background-color: #f0f0f5; /* Couleur de fond gris */
             border: 1px solid #ccc; /* Bordure grise */
@@ -255,7 +255,7 @@
                 const playerDocId = `Player${playerCount}`;
                 
                 await db.collection('Joueurs').doc(playerDocId).set({ username });
-                console.log(`Pseudo sauvegardé dans Firestore sous ${playerDocId} :`, username);
+                console.log('Pseudo sauvegardé dans Firestore :', username);
                 
                 return username; // Retourne le pseudo sauvegardé
             } catch (error) {
