@@ -54,8 +54,11 @@
         }
 
         .chat-container {
-            width: 150px; /* Réduire la largeur du conteneur de chat */
+            width: 180px; /* Largeur légèrement augmentée du conteneur de chat */
+            height: 300px; /* Hauteur augmentée */
             margin-right: 20px; /* Espace entre le chat et le reste */
+            position: relative; /* Pour un positionnement relatif */
+            right: 20px; /* Pour décaler le chat vers le centre */
         }
 
         .main-container {
@@ -146,7 +149,8 @@
         /* Style pour le chat */
         #chatContainer {
             display: none; /* Cacher le chat par défaut */
-            width: 150px; /* Réduire encore la largeur du chat */
+            width: 180px; /* Largeur légèrement augmentée du chat */
+            height: 300px; /* Hauteur augmentée */
             padding: 15px;
             background-color: #f0f0f5; /* Couleur de fond gris */
             border: 1px solid #ccc; /* Bordure grise */
@@ -164,6 +168,19 @@
             font-size: 3em; /* Taille de police plus grande pour le nom du joueur */
             font-weight: bold; /* Met le texte en gras */
             color: #333; /* Couleur du texte */
+        }
+
+        /* Style pour afficher le pseudo final */
+        #finalUsernameContainer {
+            display: none; /* Initialement caché */
+            text-align: center; /* Centrer le texte */
+            font-size: 3em; /* Taille de police pour le pseudo final */
+            font-weight: bold; /* Met le texte en gras */
+            color: #333; /* Couleur du texte */
+            position: absolute; /* Positionnement absolu */
+            top: 50%; /* Centre verticalement */
+            left: 50%; /* Centre horizontalement */
+            transform: translate(-50%, -50%); /* Ajustement pour un véritable centrage */
         }
     </style>
 </head>
@@ -209,6 +226,10 @@
         </div>
     </div>
 
+    <div id="finalUsernameContainer">
+        <p>Votre pseudo : <span id="finalUsername"></span></p> <!-- Conteneur pour afficher le pseudo final -->
+    </div>
+
     <script>
         // Génération d'un code aléatoire de 3 chiffres
         function generateRandomCode() {
@@ -222,39 +243,22 @@
 
         // Fonction pour supprimer tous les documents de la collection "Joueurs"
         async function clearPlayersCollection() {
-            const playersSnapshot = await db.collection('Joueurs').get();
-            const batch = db.batch();
-            playersSnapshot.forEach(doc => {
-                batch.delete(doc.ref);
+            const snapshot = await db.collection('Joueurs').get();
+            snapshot.forEach(doc => {
+                db.collection('Joueurs').doc(doc.id).delete();
             });
-            await batch.commit();
-            console.log('Tous les documents de la collection "Joueurs" ont été supprimés.');
         }
 
-        // Fonction pour sauvegarder le code dans Firestore en utilisant un document unique
+        // Fonction pour sauvegarder le code dans Firestore
         async function saveCodeToFirestore(code) {
-            try {
-                // Supprime tous les joueurs avant de sauvegarder un nouveau code
-                await clearPlayersCollection();
-
-                await db.collection('hostCodes').doc('codes').set({ code });
-                console.log('Code sauvegardé dans Firestore :', code);
-
-                // Affiche la liste des joueurs en temps réel
-                displayPlayersList();
-            } catch (error) {
-                console.error('Erreur lors de la sauvegarde du code:', error);
-            }
+            await db.collection('hostCodes').doc('codes').set({ code: code });
+            console.log('Code sauvegardé dans Firestore :', code);
         }
 
-        // Fonction pour sauvegarder le pseudo dans la collection "Joueurs" avec nom incrémenté
+        // Fonction pour sauvegarder le pseudo dans Firestore
         async function saveUsernameToFirestore(username) {
             try {
-                const playersSnapshot = await db.collection('Joueurs').get();
-                const playerCount = playersSnapshot.size + 1;
-                const playerDocId = `Player${playerCount}`;
-                
-                await db.collection('Joueurs').doc(playerDocId).set({ username });
+                await db.collection('Joueurs').add({ username });
                 console.log('Pseudo sauvegardé dans Firestore :', username);
                 
                 return username; // Retourne le pseudo sauvegardé
@@ -309,7 +313,12 @@
             if (isValid) {
                 // Cacher tout sauf le conteneur pour le pseudo
                 document.getElementById('playerContainer').style.display = 'none';
-                document.getElementById('usernameContainer').style.display = 'block';
+                document.querySelector('.container').style.display = 'none'; // Cacher la conteneur principal
+                document.getElementById('finalUsernameContainer').style.display = 'block'; // Afficher le pseudo final
+
+                // Affiche le pseudo saisi
+                const username = document.getElementById('username').value;
+                document.getElementById('finalUsername').textContent = username;
             } else {
                 document.getElementById('errorMsg').textContent = 'Code invalide, veuillez réessayer.';
             }
@@ -321,7 +330,7 @@
                 const savedUsername = await saveUsernameToFirestore(username);
 
                 // Cacher tout sauf la liste des joueurs
-                document.querySelector('.container').innerHTML = ""; // Vide le conteneur
+                document.querySelector('.container').style.display = 'none'; // Vide le conteneur principal
                 const finalPlayersListContainer = document.createElement('div');
                 finalPlayersListContainer.id = 'finalPlayersListContainer';
                 finalPlayersListContainer.innerHTML = `<h3>Nom du joueur :</h3>
