@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Firebase Firestore</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
+    input, button, textarea { font-size: 18px; padding: 10px; margin-top: 10px; }
+    h2 { color: #333; }
+  </style>
+</head>
+<body>
+  <h1>Test de Connexion Firestore</h1>
+  
+  <h2 id="result">Résultat :</h2>
+
+  <textarea id="textInput" rows="4" cols="50" placeholder="Écrivez ici..."></textarea><br>
+  <button onclick="updateText()">Mettre à jour le texte</button>
+
+  <h2>Texte affiché : <span id="displayText">Texte vide</span></h2>
+
+  <script>
+    // Configuration Firebase
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Initialiser Firebase et Firestore
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Écouter les mises à jour de texte en temps réel dès le chargement de la page
+    listenForTextUpdates();
+
+    // Fonction pour mettre à jour le texte
+    function updateText() {
+      const textInput = document.getElementById("textInput").value;
+      console.log("Texte à mettre à jour :", textInput); // Pour déboguer
+
+      db.collection("sharedText").doc("currentText").set({ text: textInput })
+        .then(() => {
+          console.log("Texte mis à jour avec succès !");
+        })
+        .catch((error) => {
+          console.error("Erreur lors de la mise à jour du texte :", error);
+        });
+    }
+
+    // Écouter les mises à jour de texte
+    function listenForTextUpdates() {
+      db.collection("sharedText").doc("currentText").onSnapshot((doc) => {
+        if (doc.exists) {
+          const data = doc.data();
+          console.log("Texte reçu de Firestore :", data.text); // Pour déboguer
+          document.getElementById("displayText").innerText = data.text || "Texte vide";
+        } else {
+          console.log("Aucun document trouvé !");
+        }
+      });
+    }
+  </script>
+</body>
+</html>
