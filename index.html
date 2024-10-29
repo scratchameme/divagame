@@ -12,12 +12,12 @@
     <script>
         // Initialisation Firebase avec configuration (remplacez par vos propres identifiants)
         const firebaseConfig = {
-          apiKey: "AIzaSyDejZmhxJ-wjwJ3-nE2I43vMmhRqgqhcxA",
-          authDomain: "divagame-97e7c.firebaseapp.com",
-          projectId: "divagame-97e7c",
-          storageBucket: "divagame-97e7c.appspot.com",
-          messagingSenderId: "253959990116",
-          appId: "1:253959990116:web:506a1d0cdf752823656871"
+            apiKey: "VOTRE_API_KEY",
+            authDomain: "VOTRE_AUTH_DOMAIN",
+            projectId: "VOTRE_PROJECT_ID",
+            storageBucket: "VOTRE_STORAGE_BUCKET",
+            messagingSenderId: "VOTRE_MESSAGING_SENDER_ID",
+            appId: "VOTRE_APP_ID"
         };
 
         // Initialise Firebase
@@ -134,6 +134,19 @@
             color: #4CAF50; /* Change la couleur pour la rendre plus visible */
             text-align: center; /* Centre le code */
         }
+
+        /* Style pour le chat */
+        #chatContainer {
+            display: none; /* Cacher le chat par défaut */
+            width: 100%;
+            max-width: 300px;
+            padding: 15px;
+            background-color: #f0f0f5; /* Couleur de fond gris */
+            border: 1px solid #ccc; /* Bordure grise */
+            border-radius: 5px;
+            margin-top: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -166,8 +179,13 @@
         </div>
 
         <div id="finalPlayersListContainer" style="display: none;">
-            <h3>Joueurs :</h3> <!-- Titre modifié ici -->
+            <h3>Nom du joueur :</h3> <!-- Modifié ici -->
             <ul id="finalPlayersList"></ul> <!-- Nouvelle liste pour afficher les joueurs -->
+        </div>
+
+        <div id="chatContainer">
+            <h3>Chat</h3> <!-- Titre du chat -->
+            <p>Le chat apparaîtra ici.</p> <!-- Texte de l'espace de chat -->
         </div>
     </div>
 
@@ -241,25 +259,25 @@
             });
         }
 
-        // Vérifier le code de l'hébergeur
+        // Fonction pour vérifier le code d'hôte
         async function verifyHostCode(code) {
             const doc = await db.collection('hostCodes').doc('codes').get();
-            if (doc.exists) {
-                return doc.data().code === code;
-            }
-            return false;
+            return doc.exists && doc.data().code === code;
         }
 
-        // Gestion des clics de boutons
-        document.getElementById('hostBtn').onclick = async function() {
-            const code = generateRandomCode();
-            document.getElementById('hostCode').textContent = code;
-            await saveCodeToFirestore(code);
-            document.getElementById('codeContainer').style.display = 'block';
+        // Événements de clic sur les boutons
+        document.getElementById('hostBtn').onclick = function() {
+            // Génère et affiche un code pour l'hébergeur
+            const hostCode = generateRandomCode();
+            document.getElementById('hostCode').textContent = hostCode;
+            saveCodeToFirestore(hostCode);
             
-            // Cacher les boutons "Hébergeur" et "Joueur"
+            // Cacher les boutons et afficher le conteneur de code
             document.querySelector('.button-container').style.display = 'none';
-            displayPlayersList(); // Affiche la liste des joueurs
+            document.getElementById('codeContainer').style.display = 'block';
+
+            // Affiche le conteneur de chat
+            document.getElementById('chatContainer').style.display = 'block'; // Affiche le conteneur de chat
         };
 
         document.getElementById('playerBtn').onclick = function() {
@@ -287,7 +305,7 @@
                 // Cacher tout sauf la liste des joueurs
                 document.querySelector('.container').innerHTML = ""; // Vide le conteneur
                 const playersListContainer = document.createElement('div');
-                playersListContainer.innerHTML = `<h3>Joueurs :</h3>
+                playersListContainer.innerHTML = `<h3>Nom du joueur :</h3>
                                                   <ul id="finalPlayersList">
                                                       <li><strong>${savedUsername}</strong></li>
                                                   </ul>`;
