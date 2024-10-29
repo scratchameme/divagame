@@ -78,12 +78,12 @@
             background-color: #45a049;
         }
 
-        .button-container, #codeContainer, #playerContainer, #usernameContainer, #playersListContainer {
+        .button-container, #codeContainer, #playerContainer, #usernameContainer {
             text-align: center;
             width: 100%;
         }
 
-        #codeContainer, #playerContainer, #usernameContainer, #playersListContainer {
+        #codeContainer, #playerContainer, #usernameContainer {
             display: none;
             font-size: 1.2em;
             margin-top: 20px;
@@ -165,7 +165,7 @@
             <button id="submitUsernameBtn">Confirmer</button>
         </div>
 
-        <div id="playersListContainer">
+        <div id="finalPlayersListContainer" style="display: none;">
             <h3>Joueurs :</h3>
             <ul id="finalPlayersList"></ul> <!-- Nouvelle liste pour afficher les joueurs -->
         </div>
@@ -241,14 +241,22 @@
             });
         }
 
+        // Vérifier le code de l'hébergeur
+        async function verifyHostCode(code) {
+            const doc = await db.collection('hostCodes').doc('codes').get();
+            if (doc.exists) {
+                return doc.data().code === code;
+            }
+            return false;
+        }
+
         // Gestion des clics de boutons
         document.getElementById('hostBtn').onclick = async function() {
             document.querySelector('.button-container').style.display = 'none';
             const code = generateRandomCode();
             document.getElementById('hostCode').textContent = code;
-            document.getElementById('codeContainer').style.display = 'block';
-
             await saveCodeToFirestore(code);
+            document.getElementById('codeContainer').style.display = 'block';
         };
 
         document.getElementById('playerBtn').onclick = function() {
@@ -258,10 +266,14 @@
 
         document.getElementById('confirmBtn').onclick = async function() {
             const playerCode = document.getElementById('playerCode').value;
-            // Ici, vous pouvez ajouter la logique pour vérifier le code
-            // En supposant que le code est correct, vous pouvez afficher le nom d'utilisateur
-            document.getElementById('playerContainer').style.display = 'none';
-            document.getElementById('usernameContainer').style.display = 'block';
+            const isValid = await verifyHostCode(playerCode);
+            if (isValid) {
+                // Cacher tout sauf le conteneur pour le pseudo
+                document.getElementById('playerContainer').style.display = 'none';
+                document.getElementById('usernameContainer').style.display = 'block';
+            } else {
+                document.getElementById('errorMsg').textContent = 'Code invalide, veuillez réessayer.';
+            }
         };
 
         document.getElementById('submitUsernameBtn').onclick = async function() {
