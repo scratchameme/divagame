@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boutons Hébergeur & Joueur</title>
-    <!-- Ajoutez ce script pour Firebase version compatible sans module -->
+    
+    <!-- Ajouter Firebase (SDK compatible) -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     
     <script>
-        // Initialisez Firebase ici avec vos informations de configuration
+        // Initialisation Firebase avec configuration (remplacez par vos propres identifiants)
         const firebaseConfig = {
           apiKey: "AIzaSyDejZmhxJ-wjwJ3-nE2I43vMmhRqgqhcxA",
           authDomain: "divagame-97e7c.firebaseapp.com",
@@ -19,9 +20,11 @@
           appId: "1:253959990116:web:506a1d0cdf752823656871"
         };
 
+        // Initialise Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
     </script>
+
     <style>
         /* Styles de base */
         body {
@@ -69,10 +72,11 @@
             return code;
         }
 
-        // Fonction pour sauvegarder le code dans Firestore
+        // Fonction pour sauvegarder le code dans Firestore en utilisant un document unique
         async function saveCodeToFirestore(code) {
             try {
-                await db.collection('hostCodes').add({ code });
+                // On utilise set() avec un ID de document spécifique pour le remplacer chaque fois
+                await db.collection('hostCodes').doc('codes').set({ code });
                 console.log('Code sauvegardé dans Firestore :', code);
             } catch (error) {
                 console.error('Erreur lors de la sauvegarde du code:', error);
