@@ -43,15 +43,23 @@
         }
 
         .container {
+            display: flex; /* Changement ici pour utiliser Flexbox */
+            flex-direction: row; /* Disposition en ligne */
             width: 100%;
-            max-width: 600px;
+            max-width: 800px; /* Largeur maximale de la conteneur */
             padding: 20px;
             background-color: #ffffff;
             box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        }
+
+        .chat-container {
+            width: 300px; /* Largeur du conteneur de chat */
+            margin-right: 20px; /* Espace entre le chat et le reste */
+        }
+
+        .main-container {
+            flex-grow: 1; /* Prend tout l'espace restant */
         }
 
         h3 {
@@ -139,53 +147,53 @@
         #chatContainer {
             display: none; /* Cacher le chat par défaut */
             width: 100%;
-            max-width: 300px;
             padding: 15px;
             background-color: #f0f0f5; /* Couleur de fond gris */
             border: 1px solid #ccc; /* Bordure grise */
             border-radius: 5px;
-            margin-top: 20px;
-            text-align: center;
+            text-align: center; /* Centre le texte du chat */
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="button-container">
-            <button id="hostBtn">Hébergeur</button>
-            <button id="playerBtn">Joueur</button>
-        </div>
-
-        <div id="codeContainer">
-            <p>Code : <strong><span id="hostCode"></span></strong></p>
-            <div id="playersListContainer">
-                <h3>Joueurs connectés :</h3>
-                <ul id="playersList"></ul>
-            </div>
-        </div>
-
-        <div id="playerContainer">
-            <label for="playerCode">Code :</label>
-            <input type="text" id="playerCode" placeholder="Entrez le code">
-            <button id="confirmBtn">Confirmer</button>
-            <p id="errorMsg"></p>
-        </div>
-
-        <div id="usernameContainer">
-            <label for="username">Pseudo :</label>
-            <input type="text" id="username" placeholder="Entrez votre pseudo">
-            <button id="submitUsernameBtn">Confirmer</button>
-        </div>
-
-        <div id="finalPlayersListContainer" style="display: none;">
-            <h3>Nom du joueur :</h3> <!-- Modifié ici -->
-            <ul id="finalPlayersList"></ul> <!-- Nouvelle liste pour afficher les joueurs -->
-        </div>
-
-        <div id="chatContainer">
+        <div class="chat-container" id="chatContainer">
             <h3>Chat</h3> <!-- Titre du chat -->
             <p>Le chat apparaîtra ici.</p> <!-- Texte de l'espace de chat -->
+        </div>
+
+        <div class="main-container">
+            <div class="button-container">
+                <button id="hostBtn">Hébergeur</button>
+                <button id="playerBtn">Joueur</button>
+            </div>
+
+            <div id="codeContainer">
+                <p>Code : <strong><span id="hostCode"></span></strong></p>
+                <div id="playersListContainer">
+                    <h3>Joueurs connectés :</h3>
+                    <ul id="playersList"></ul>
+                </div>
+            </div>
+
+            <div id="playerContainer">
+                <label for="playerCode">Code :</label>
+                <input type="text" id="playerCode" placeholder="Entrez le code">
+                <button id="confirmBtn">Confirmer</button>
+                <p id="errorMsg"></p>
+            </div>
+
+            <div id="usernameContainer">
+                <label for="username">Pseudo :</label>
+                <input type="text" id="username" placeholder="Entrez votre pseudo">
+                <button id="submitUsernameBtn">Confirmer</button>
+            </div>
+
+            <div id="finalPlayersListContainer" style="display: none;">
+                <h3>Nom du joueur :</h3> <!-- Modifié ici -->
+                <ul id="finalPlayersList"></ul> <!-- Nouvelle liste pour afficher les joueurs -->
+            </div>
         </div>
     </div>
 
@@ -248,12 +256,10 @@
             playersListContainer.innerHTML = ""; // Réinitialise la liste
 
             // Met en place un écouteur sur la collection "Joueurs"
-            db.collection('Joueurs').onSnapshot(snapshot => {
-                playersListContainer.innerHTML = ""; // Efface la liste actuelle
+            db.collection('Joueurs').onSnapshot((snapshot) => {
                 snapshot.forEach(doc => {
-                    const player = doc.data().username;
                     const li = document.createElement('li');
-                    li.textContent = player;
+                    li.textContent = doc.data().username; // Obtient le pseudo
                     playersListContainer.appendChild(li);
                 });
             });
