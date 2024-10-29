@@ -149,7 +149,7 @@
             text-align: center; /* Centre le code */
         }
 
-        /* Style pour afficher le pseudo du joueur */
+        /* Style pour afficher le nom du joueur */
         #finalPlayersListContainer {
             display: none; /* Initialement caché */
             text-align: center; /* Centrer le texte */
@@ -159,14 +159,6 @@
             font-size: 3em; /* Taille de police plus grande pour le nom du joueur */
             font-weight: bold; /* Met le texte en gras */
             color: #333; /* Couleur du texte */
-        }
-
-        /* Nouveau style pour afficher le pseudo */
-        #playerNameContainer {
-            display: none; /* Cacher par défaut */
-            text-align: center; /* Centrer le texte */
-            font-size: 2em; /* Taille de police pour le nom du joueur */
-            margin-top: 20px; /* Espace au-dessus du texte */
         }
     </style>
 </head>
@@ -209,10 +201,6 @@
                 <h3>Nom du joueur :</h3> <!-- Modifié ici -->
                 <ul id="finalPlayersList"></ul> <!-- Nouvelle liste pour afficher les joueurs -->
             </div>
-
-            <div id="playerNameContainer">
-                <p>Votre nom: <span id="displayedUsername"></span></p> <!-- Affichage du nom du joueur -->
-            </div>
         </div>
     </div>
 
@@ -248,73 +236,101 @@
                 console.log('Code sauvegardé dans Firestore :', code);
 
                 // Affiche la liste des joueurs en temps réel
-                db.collection('Joueurs').onSnapshot(snapshot => {
-                    const playersList = document.getElementById('playersList');
-                    playersList.innerHTML = ''; // Réinitialise la liste des joueurs
-
-                    snapshot.forEach(doc => {
-                        const playerData = doc.data();
-                        const playerItem = document.createElement('li');
-                        playerItem.textContent = playerData.username; // Affiche uniquement le pseudo
-                        playersList.appendChild(playerItem);
-                    });
-                });
-
-                document.getElementById('hostCode').textContent = code; // Affiche le code à l'hébergeur
+                displayPlayersList();
             } catch (error) {
-                console.error('Erreur lors de la sauvegarde du code :', error);
+                console.error('Erreur lors de la sauvegarde du code:', error);
             }
         }
 
-        // Fonction pour ajouter un joueur à la base de données Firestore
-        async function addPlayerToFirestore(username) {
+        // Fonction pour sauvegarder le pseudo dans la collection "Joueurs" avec nom incrémenté
+        async function saveUsernameToFirestore(username) {
             try {
-                // Ajout du joueur dans Firestore
-                await db.collection('Joueurs').add({ username });
-
-                // Affiche le nom du joueur sur l'écran du joueur
-                document.getElementById('displayedUsername').textContent = username;
-                document.getElementById('playerNameContainer').style.display = 'block'; // Affiche le pseudo
+                const playersSnapshot = await db.collection('Joueurs').get();
+                const playerCount = playersSnapshot.size + 1;
+                const playerDocId = `Player${playerCount}`;
+                
+                await db.collection('Joueurs').doc(playerDocId).set({ username });
+                console.log('Pseudo sauvegardé dans Firestore :', username);
+                
+                // Mettre à jour la liste des joueurs
+                displayPlayersList();
             } catch (error) {
-                console.error('Erreur lors de l\'ajout du joueur :', error);
+                console.error('Erreur lors de la sauvegarde du pseudo:', error);
             }
         }
 
-        // Événements
+        // Fonction pour afficher la liste des joueurs
+        async function displayPlayersList() {
+            const playersSnapshot = await db.collection('Joueurs').get();
+            const playersListElement = document.getElementById('playersList');
+            const finalPlayersListElement = document.getElementById('finalPlayersList');
+
+            playersListElement.innerHTML = ''; // Efface la liste précédente
+            finalPlayersListElement.innerHTML = ''; // Efface la liste précédente
+            let playerNames = '';
+
+            playersSnapshot.forEach(doc => {
+                const playerData = doc.data();
+                const li = document.createElement('li');
+                li.textContent = playerData.username;
+                playersListElement.appendChild(li);
+                playerNames += `<li>${playerData.username}</li>`;
+            });
+
+            // Mettre à jour le texte final avec le nom du joueur
+            finalPlayersListElement.innerHTML = playerNames;
+        }
+
+        // Événement lorsque le bouton "Hébergeur" est cliqué
         document.getElementById('hostBtn').addEventListener('click', async () => {
             const code = generateRandomCode();
+            document.getElementById('hostCode').textContent = code;
+
+            // Sauvegarder le code dans Firestore
             await saveCodeToFirestore(code);
-            document.getElementById('codeContainer').style.display = 'block'; // Affiche le conteneur du code
-            document.getElementById('chatContainer').style.display = 'block'; // Affiche le chat
-            document.getElementById('finalPlayersListContainer').style.display = 'none'; // Cacher la liste finale des joueurs
-            document.getElementById('playerNameContainer').style.display = 'none'; // Cacher le pseudo du joueur
+            document.getElementById('codeContainer').style.display = 'block';
+            document.getElementById('playerContainer').style.display = 'none'; // Cacher la zone du joueur
+            document.getElementById('usernameContainer').style.display = 'none'; // Cacher la zone de pseudo
+            document.getElementById('finalPlayersListContainer').style.display = 'none'; // Cacher le conteneur de noms
         });
 
+        // Événement lorsque le bouton "Joueur" est cliqué
         document.getElementById('playerBtn').addEventListener('click', () => {
-            document.getElementById('playerContainer').style.display = 'block'; // Affiche le conteneur pour le joueur
-            document.getElementById('usernameContainer').style.display = 'block'; // Affiche le conteneur pour le pseudo
-            document.getElementById('chatContainer').style.display = 'none'; // Cacher le chat
-            document.getElementById('codeContainer').style.display = 'none'; // Cacher le conteneur de code
-            document.getElementById('finalPlayersListContainer').style.display = 'none'; // Cacher la liste finale des joueurs
-            document.getElementById('playerNameContainer').style.display = 'none'; // Cacher le pseudo du joueur
+            document.getElementById('codeContainer').style.display = 'none'; // Cacher le conteneur du code
+            document.getElementById('playerContainer').style.display = 'block'; // Afficher le conteneur du joueur
+            document.getElementById('usernameContainer').style.display = 'none'; // Cacher le conteneur de pseudo
+            document.getElementById('finalPlayersListContainer').style.display = 'none'; // Cacher le conteneur de noms
         });
 
-        document.getElementById('confirmBtn').addEventListener('click', () => {
+        // Événement lorsque le bouton de confirmation est cliqué
+        document.getElementById('confirmBtn').addEventListener('click', async () => {
             const playerCode = document.getElementById('playerCode').value;
-            // Ici vous pourriez ajouter une logique pour vérifier le code
-            // Si le code est correct, afficher les boutons
-            document.getElementById('playerContainer').style.display = 'none'; // Cacher le conteneur pour le joueur
-            document.getElementById('usernameContainer').style.display = 'block'; // Affiche le conteneur pour le pseudo
+            const codeSnapshot = await db.collection('hostCodes').doc('codes').get();
+            const storedCode = codeSnapshot.data().code;
+
+            if (playerCode === storedCode) {
+                document.getElementById('codeContainer').style.display = 'none'; // Cacher le conteneur du code
+                document.getElementById('playerContainer').style.display = 'none'; // Cacher le conteneur du joueur
+                document.getElementById('usernameContainer').style.display = 'block'; // Afficher le conteneur de pseudo
+                document.getElementById('finalPlayersListContainer').style.display = 'none'; // Cacher le conteneur de noms
+                document.getElementById('errorMsg').textContent = ''; // Effacer le message d'erreur
+            } else {
+                document.getElementById('errorMsg').textContent = 'Code incorrect, veuillez réessayer.'; // Afficher un message d'erreur
+            }
         });
 
-        document.getElementById('submitUsernameBtn').addEventListener('click', () => {
-            const username = document.getElementById('username').value.trim();
+        // Événement lorsque le bouton de soumission de pseudo est cliqué
+        document.getElementById('submitUsernameBtn').addEventListener('click', async () => {
+            const username = document.getElementById('username').value;
             if (username) {
-                addPlayerToFirestore(username); // Ajoute le joueur à Firestore
-                document.getElementById('usernameContainer').style.display = 'none'; // Cache le conteneur de pseudo
-                document.getElementById('finalPlayersListContainer').style.display = 'block'; // Affiche la liste finale des joueurs
+                await saveUsernameToFirestore(username);
+                
+                // Masquer les champs et afficher le nom
+                document.getElementById('usernameContainer').style.display = 'none'; // Cacher le conteneur de pseudo
+                document.getElementById('finalPlayersListContainer').style.display = 'block'; // Afficher le conteneur de noms
             }
         });
     </script>
 </body>
 </html>
+
