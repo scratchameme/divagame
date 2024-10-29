@@ -43,38 +43,15 @@
         }
 
         .container {
-            display: flex; /* Changer pour flex pour aligner le chat et le conteneur principal */
             width: 100%;
-            max-width: 900px; /* Ajuster la largeur pour le chat et le conteneur principal */
+            max-width: 600px;
             padding: 20px;
             background-color: #ffffff;
             box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
-        }
-
-        .chatContainer {
-            display: none; /* Masquer le conteneur de chat par défaut */
-            width: 25%; /* Largeur du conteneur de chat, ajusté pour être plus à gauche */
-            margin-right: 20px; /* Espacement entre le chat et le conteneur principal */
-            background-color: #f9f9f9; /* Couleur de fond pour le chat */
-            padding: 10px;
-            border-radius: 10px;
             display: flex;
             flex-direction: column;
-            height: 100%; /* Hauteur du conteneur de chat */
-        }
-
-        .chatContainer h4 {
-            text-align: center; /* Centrer le texte "Chat" */
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .mainContainer {
-            width: 75%; /* Largeur du conteneur principal */
-            display: flex;
-            flex-direction: column;
-            height: 100%; /* Hauteur du conteneur principal */
+            align-items: center;
         }
 
         h3 {
@@ -99,6 +76,11 @@
 
         button:hover {
             background-color: #45a049;
+        }
+
+        .button-container, #codeContainer, #playerContainer, #usernameContainer {
+            text-align: center;
+            width: 100%;
         }
 
         #codeContainer, #playerContainer, #usernameContainer {
@@ -157,44 +139,35 @@
 <body>
 
     <div class="container">
-        <div class="chatContainer">
-            <h4>Chat</h4>
-            <div id="chatMessages" style="flex-grow: 1; overflow-y: auto; margin-bottom: 10px;"></div>
-            <input type="text" id="chatInput" placeholder="Entrez votre message">
-            <button id="sendChatBtn">Envoyer</button>
+        <div class="button-container">
+            <button id="hostBtn">Hébergeur</button>
+            <button id="playerBtn">Joueur</button>
         </div>
 
-        <div class="mainContainer">
-            <div class="button-container">
-                <button id="hostBtn">Hébergeur</button>
-                <button id="playerBtn">Joueur</button>
+        <div id="codeContainer">
+            <p>Code : <strong><span id="hostCode"></span></strong></p>
+            <div id="playersListContainer">
+                <h3>Joueurs connectés :</h3>
+                <ul id="playersList"></ul>
             </div>
+        </div>
 
-            <div id="codeContainer">
-                <p>Code : <strong><span id="hostCode"></span></strong></p>
-                <div id="playersListContainer">
-                    <h3>Joueurs connectés :</h3>
-                    <ul id="playersList"></ul>
-                </div>
-            </div>
+        <div id="playerContainer">
+            <label for="playerCode">Code :</label>
+            <input type="text" id="playerCode" placeholder="Entrez le code">
+            <button id="confirmBtn">Confirmer</button>
+            <p id="errorMsg"></p>
+        </div>
 
-            <div id="playerContainer">
-                <label for="playerCode">Code :</label>
-                <input type="text" id="playerCode" placeholder="Entrez le code">
-                <button id="confirmBtn">Confirmer</button>
-                <p id="errorMsg"></p>
-            </div>
+        <div id="usernameContainer">
+            <label for="username">Pseudo :</label>
+            <input type="text" id="username" placeholder="Entrez votre pseudo">
+            <button id="submitUsernameBtn">Confirmer</button>
+        </div>
 
-            <div id="usernameContainer">
-                <label for="username">Pseudo :</label>
-                <input type="text" id="username" placeholder="Entrez votre pseudo">
-                <button id="submitUsernameBtn">Confirmer</button>
-            </div>
-
-            <div id="finalPlayersListContainer" style="display: none;">
-                <h3>Joueurs :</h3> <!-- Titre modifié ici -->
-                <ul id="finalPlayersList"></ul> <!-- Nouvelle liste pour afficher les joueurs -->
-            </div>
+        <div id="finalPlayersListContainer" style="display: none;">
+            <h3>Joueurs :</h3> <!-- Titre modifié ici -->
+            <ul id="finalPlayersList"></ul> <!-- Nouvelle liste pour afficher les joueurs -->
         </div>
     </div>
 
@@ -241,11 +214,11 @@
             try {
                 const playersSnapshot = await db.collection('Joueurs').get();
                 const playerCount = playersSnapshot.size + 1;
-                const playerDocId = `Player${playerCount}`;
+                const playerDocId = Player${playerCount};
                 
                 await db.collection('Joueurs').doc(playerDocId).set({ username });
-                console.log(`Pseudo sauvegardé dans Firestore sous ${playerDocId}:`, username);
-                return username; // Retourne le pseudo sauvegardé
+                console.log(Pseudo sauvegardé dans Firestore sous ${playerDocId} :, username);
+                return username; // Retourne le pseudo pour l'affichage
             } catch (error) {
                 console.error('Erreur lors de la sauvegarde du pseudo :', error);
             }
@@ -284,26 +257,11 @@
             await saveCodeToFirestore(code);
             document.getElementById('codeContainer').style.display = 'block';
             displayPlayersList(); // Affiche la liste des joueurs
-
-            // Afficher le conteneur de chat
-            document.querySelector('.chatContainer').style.display = 'flex'; // Affiche le chat
-
-            // Cacher le bouton "Hébergeur"
-            document.getElementById('hostBtn').style.display = 'none';
-            // Afficher le bouton "Joueur"
-            document.getElementById('playerBtn').style.display = 'inline-block';
         };
 
         document.getElementById('playerBtn').onclick = function() {
-            // Cacher le bouton "Joueur"
-            document.getElementById('playerBtn').style.display = 'none';
-            // Afficher le bouton "Hébergeur"
-            document.getElementById('hostBtn').style.display = 'inline-block';
-
-            // Cacher tout sauf le conteneur pour le code
+            document.querySelector('.button-container').style.display = 'none';
             document.getElementById('playerContainer').style.display = 'block';
-            // Cacher le conteneur de chat
-            document.querySelector('.chatContainer').style.display = 'none';
         };
 
         document.getElementById('confirmBtn').onclick = async function() {
@@ -326,28 +284,14 @@
                 // Cacher tout sauf la liste des joueurs
                 document.querySelector('.container').innerHTML = ""; // Vide le conteneur
                 const playersListContainer = document.createElement('div');
-                playersListContainer.innerHTML = `<h3>Joueurs :</h3>
+                playersListContainer.innerHTML = <h3>Joueurs :</h3> <!-- Titre modifié ici -->
                                                   <ul id="finalPlayersList">
                                                       <li><strong>${savedUsername}</strong></li>
-                                                  </ul>`;
+                                                  </ul>;
                 document.querySelector('.container').appendChild(playersListContainer);
                 
                 // Affiche la liste des autres joueurs
                 displayPlayersList();
-            }
-        };
-
-        // Gestion de l'envoi de messages dans le chat
-        document.getElementById('sendChatBtn').onclick = function() {
-            const chatInput = document.getElementById('chatInput');
-            const message = chatInput.value;
-            if (message) {
-                const chatMessages = document.getElementById('chatMessages');
-                const messageElement = document.createElement('div');
-                messageElement.textContent = message;
-                chatMessages.appendChild(messageElement);
-                chatInput.value = ''; // Efface le champ de texte
-                chatMessages.scrollTop = chatMessages.scrollHeight; // Fait défiler vers le bas
             }
         };
     </script>
