@@ -64,6 +64,10 @@
 
     <div id="codeContainer">
         <p>Code d'hébergement : <span id="hostCode"></span></p>
+        <div id="playersListContainer">
+            <h3>Joueurs :</h3>
+            <ul id="playersList"></ul>
+        </div>
     </div>
 
     <div id="playerContainer">
@@ -109,6 +113,9 @@
 
                 await db.collection('hostCodes').doc('codes').set({ code });
                 console.log('Code sauvegardé dans Firestore :', code);
+
+                // Affiche la liste des joueurs en temps réel
+                displayPlayersList();
             } catch (error) {
                 console.error('Erreur lors de la sauvegarde du code:', error);
             }
@@ -117,12 +124,10 @@
         // Fonction pour sauvegarder le pseudo dans la collection "Joueurs" avec nom incrémenté
         async function saveUsernameToFirestore(username) {
             try {
-                // Récupère le nombre actuel de documents dans la collection "Joueurs"
                 const playersSnapshot = await db.collection('Joueurs').get();
-                const playerCount = playersSnapshot.size + 1; // Incrémentation pour le nouveau joueur
+                const playerCount = playersSnapshot.size + 1;
                 const playerDocId = `Player${playerCount}`;
-
-                // Sauvegarde le pseudo avec un nom de document incrémenté
+                
                 await db.collection('Joueurs').doc(playerDocId).set({ username });
                 console.log(`Pseudo sauvegardé dans Firestore sous ${playerDocId} :`, username);
             } catch (error) {
@@ -130,20 +135,34 @@
             }
         }
 
+        // Affiche la liste des joueurs en temps réel
+        function displayPlayersList() {
+            const playersListContainer = document.getElementById('playersList');
+            playersListContainer.innerHTML = ""; // Réinitialise la liste
+
+            // Met en place un écouteur sur la collection "Joueurs"
+            db.collection('Joueurs').onSnapshot(snapshot => {
+                playersListContainer.innerHTML = ""; // Efface la liste actuelle
+                snapshot.forEach(doc => {
+                    const player = doc.data().username;
+                    const li = document.createElement('li');
+                    li.textContent = player;
+                    playersListContainer.appendChild(li);
+                });
+            });
+        }
+
         // Gestion des clics de boutons
         document.getElementById('hostBtn').onclick = async function() {
-            // Cache les boutons et génère un code
             document.querySelector('.button-container').style.display = 'none';
             const code = generateRandomCode();
             document.getElementById('hostCode').textContent = code;
             document.getElementById('codeContainer').style.display = 'block';
 
-            // Sauvegarde le code dans Firestore
             await saveCodeToFirestore(code);
         };
 
         document.getElementById('playerBtn').onclick = function() {
-            // Cache les boutons et affiche la zone de saisie pour entrer le code
             document.querySelector('.button-container').style.display = 'none';
             document.getElementById('playerContainer').style.display = 'block';
         };
@@ -153,14 +172,13 @@
             const enteredCode = document.getElementById('playerCode').value;
             const errorMsg = document.getElementById('errorMsg');
 
-            // Récupère le code dans Firestore
             try {
                 const doc = await db.collection('hostCodes').doc('codes').get();
                 if (doc.exists) {
                     const storedCode = doc.data().code;
                     if (enteredCode === storedCode) {
                         console.log("code bon");
-                        errorMsg.textContent = ""; // Efface le message d'erreur
+                        errorMsg.textContent = ""; 
                         document.getElementById('playerContainer').style.display = 'none';
                         document.getElementById('usernameContainer').style.display = 'block';
                     } else {
@@ -191,3 +209,4 @@
 
 </body>
 </html>
+
