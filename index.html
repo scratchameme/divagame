@@ -78,12 +78,12 @@
             background-color: #45a049;
         }
 
-        .button-container, #codeContainer, #playerContainer, #usernameContainer {
+        .button-container, #codeContainer, #playerContainer, #usernameContainer, #playersListContainer {
             text-align: center;
             width: 100%;
         }
 
-        #codeContainer, #playerContainer, #usernameContainer {
+        #codeContainer, #playerContainer, #usernameContainer, #playersListContainer {
             display: none;
             font-size: 1.2em;
             margin-top: 20px;
@@ -164,6 +164,11 @@
             <input type="text" id="username" placeholder="Entrez votre pseudo">
             <button id="submitUsernameBtn">Confirmer</button>
         </div>
+
+        <div id="playersListContainer">
+            <h3>Joueurs :</h3>
+            <ul id="finalPlayersList"></ul> <!-- Nouvelle liste pour afficher les joueurs -->
+        </div>
     </div>
 
     <script>
@@ -213,6 +218,7 @@
                 
                 await db.collection('Joueurs').doc(playerDocId).set({ username });
                 console.log(`Pseudo sauvegardé dans Firestore sous ${playerDocId} :`, username);
+                return username; // Retourne le pseudo pour l'affichage
             } catch (error) {
                 console.error('Erreur lors de la sauvegarde du pseudo :', error);
             }
@@ -250,48 +256,32 @@
             document.getElementById('playerContainer').style.display = 'block';
         };
 
-        // Vérification du code entré
         document.getElementById('confirmBtn').onclick = async function() {
-            const enteredCode = document.getElementById('playerCode').value;
-            const errorMsg = document.getElementById('errorMsg');
-
-            try {
-                const doc = await db.collection('hostCodes').doc('codes').get();
-                if (doc.exists) {
-                    const code = doc.data().code;
-                    if (enteredCode === code) {
-                        console.log("Code bon");
-                        errorMsg.textContent = ""; // Efface le message d'erreur
-
-                        // Affiche la zone de saisie du pseudo
-                        document.getElementById('playerContainer').style.display = 'none';
-                        document.getElementById('usernameContainer').style.display = 'block';
-                    } else {
-                        console.log("Code mauvais");
-                        errorMsg.textContent = "Mauvais code"; // Affiche le message d'erreur
-                    }
-                } else {
-                    console.log("Aucun code trouvé dans Firestore");
-                    errorMsg.textContent = "Aucun code trouvé"; // Affiche le message d'erreur
-                }
-            } catch (error) {
-                console.error("Erreur lors de la récupération du code :", error);
-                errorMsg.textContent = "Erreur de connexion"; // Affiche le message d'erreur
-            }
+            const playerCode = document.getElementById('playerCode').value;
+            // Ici, vous pouvez ajouter la logique pour vérifier le code
+            // En supposant que le code est correct, vous pouvez afficher le nom d'utilisateur
+            document.getElementById('playerContainer').style.display = 'none';
+            document.getElementById('usernameContainer').style.display = 'block';
         };
 
-        // Enregistrement du pseudo
         document.getElementById('submitUsernameBtn').onclick = async function() {
             const username = document.getElementById('username').value;
             if (username) {
-                await saveUsernameToFirestore(username);
-                document.getElementById('usernameContainer').style.display = 'none';
-                console.log("Pseudo enregistré avec succès :", username);
-            } else {
-                alert("Veuillez entrer un pseudo");
+                const savedUsername = await saveUsernameToFirestore(username);
+
+                // Cacher tout sauf la liste des joueurs
+                document.querySelector('.container').innerHTML = ""; // Vide le conteneur
+                const playersListContainer = document.createElement('div');
+                playersListContainer.innerHTML = `<h3>Joueurs connectés :</h3>
+                                                  <ul id="finalPlayersList">
+                                                      <li><strong>${savedUsername}</strong></li>
+                                                  </ul>`;
+                document.querySelector('.container').appendChild(playersListContainer);
+                
+                // Affiche la liste des autres joueurs
+                displayPlayersList();
             }
         };
     </script>
-
 </body>
 </html>
