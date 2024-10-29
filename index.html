@@ -126,6 +126,13 @@
             padding: 5px 0;
             border-bottom: 1px solid #eee;
         }
+
+        /* Nouveau style pour le code */
+        #hostCode {
+            font-size: 2em; /* Taille de police plus grande pour le code */
+            font-weight: bold; /* Met le texte en gras */
+            color: #4CAF50; /* Change la couleur pour la rendre plus visible */
+        }
     </style>
 </head>
 <body>
@@ -137,7 +144,7 @@
         </div>
 
         <div id="codeContainer">
-            <p>Code d'hébergement : <strong><span id="hostCode"></span></strong></p>
+            <p>Code : <strong><span id="hostCode"></span></strong></p>
             <div id="playersListContainer">
                 <h3>Joueurs connectés :</h3>
                 <ul id="playersList"></ul>
@@ -252,20 +259,23 @@
                 if (doc.exists) {
                     const storedCode = doc.data().code;
                     if (enteredCode === storedCode) {
-                        console.log("code bon");
-                        errorMsg.textContent = ""; 
+                        console.log("Code bon");
+                        errorMsg.textContent = ""; // Efface le message d'erreur
+
+                        // Affiche la zone de saisie du pseudo
                         document.getElementById('playerContainer').style.display = 'none';
                         document.getElementById('usernameContainer').style.display = 'block';
                     } else {
-                        errorMsg.textContent = "Mauvais code";
+                        console.log("Code mauvais");
+                        errorMsg.textContent = "Mauvais code"; // Affiche le message d'erreur
                     }
                 } else {
                     console.log("Aucun code trouvé dans Firestore");
-                    errorMsg.textContent = "Aucun code trouvé";
+                    errorMsg.textContent = "Aucun code trouvé"; // Affiche le message d'erreur
                 }
             } catch (error) {
                 console.error("Erreur lors de la récupération du code :", error);
-                errorMsg.textContent = "Erreur de connexion";
+                errorMsg.textContent = "Erreur de connexion"; // Affiche le message d'erreur
             }
         };
 
@@ -284,4 +294,3 @@
 
 </body>
 </html>
-
