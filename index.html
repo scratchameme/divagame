@@ -34,7 +34,7 @@
             height: 100vh;
             font-family: Arial, sans-serif;
         }
-        .button-container, #codeContainer {
+        .button-container, #codeContainer, #playerContainer {
             text-align: center;
         }
         button {
@@ -43,7 +43,7 @@
             font-size: 16px;
             cursor: pointer;
         }
-        #codeContainer {
+        #codeContainer, #playerContainer {
             display: none;
             font-size: 24px;
             margin-top: 20px;
@@ -61,6 +61,12 @@
         <p>Code d'hébergement : <span id="hostCode"></span></p>
     </div>
 
+    <div id="playerContainer">
+        <label for="playerCode">Code :</label>
+        <input type="text" id="playerCode" placeholder="Entrez le code">
+        <button id="confirmBtn">Confirmer</button>
+    </div>
+
     <script>
         // Génération d'un code aléatoire de 3 chiffres
         function generateRandomCode() {
@@ -75,7 +81,6 @@
         // Fonction pour sauvegarder le code dans Firestore en utilisant un document unique
         async function saveCodeToFirestore(code) {
             try {
-                // On utilise set() avec un ID de document spécifique pour le remplacer chaque fois
                 await db.collection('hostCodes').doc('codes').set({ code });
                 console.log('Code sauvegardé dans Firestore :', code);
             } catch (error) {
@@ -96,7 +101,31 @@
         };
 
         document.getElementById('playerBtn').onclick = function() {
-            alert("Mode Joueur non implémenté");
+            // Cache les boutons et affiche la zone de saisie pour entrer le code
+            document.querySelector('.button-container').style.display = 'none';
+            document.getElementById('playerContainer').style.display = 'block';
+        };
+
+        // Vérification du code entré
+        document.getElementById('confirmBtn').onclick = async function() {
+            const enteredCode = document.getElementById('playerCode').value;
+
+            // Récupère le code dans Firestore
+            try {
+                const doc = await db.collection('hostCodes').doc('codes').get();
+                if (doc.exists) {
+                    const storedCode = doc.data().code;
+                    if (enteredCode === storedCode) {
+                        console.log("code bon");
+                    } else {
+                        console.log("code mauvais");
+                    }
+                } else {
+                    console.log("Aucun code trouvé dans Firestore");
+                }
+            } catch (error) {
+                console.error("Erreur lors de la récupération du code :", error);
+            }
         };
     </script>
 
