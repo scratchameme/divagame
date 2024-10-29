@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boutons Hébergeur & Joueur</title>
+    <title>Interface Responsive - Hébergeur & Joueur</title>
     
     <!-- Ajouter Firebase (SDK compatible) -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -12,12 +12,12 @@
     <script>
         // Initialisation Firebase avec configuration (remplacez par vos propres identifiants)
         const firebaseConfig = {
-          apiKey: "AIzaSyDejZmhxJ-wjwJ3-nE2I43vMmhRqgqhcxA",
-          authDomain: "divagame-97e7c.firebaseapp.com",
-          projectId: "divagame-97e7c",
-          storageBucket: "divagame-97e7c.appspot.com",
-          messagingSenderId: "253959990116",
-          appId: "1:253959990116:web:506a1d0cdf752823656871"
+            apiKey: "VOTRE_API_KEY",
+            authDomain: "VOTRE_AUTH_DOMAIN",
+            projectId: "VOTRE_PROJECT_ID",
+            storageBucket: "VOTRE_STORAGE_BUCKET",
+            messagingSenderId: "VOTRE_MESSAGING_SENDER_ID",
+            appId: "VOTRE_APP_ID"
         };
 
         // Initialise Firebase
@@ -27,60 +27,135 @@
 
     <style>
         /* Styles de base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             font-family: Arial, sans-serif;
+            background-color: #f0f0f5;
         }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h3 {
+            margin-top: 20px;
+            font-size: 1.5em;
+            color: #333;
+        }
+
+        button {
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 1.2em;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
         .button-container, #codeContainer, #playerContainer, #usernameContainer {
             text-align: center;
+            width: 100%;
         }
-        button {
-            padding: 10px 20px;
-            margin: 5px;
-            font-size: 16px;
-            cursor: pointer;
-        }
+
         #codeContainer, #playerContainer, #usernameContainer {
             display: none;
-            font-size: 24px;
+            font-size: 1.2em;
             margin-top: 20px;
+            width: 100%;
         }
+
         #errorMsg {
             color: red;
-            font-size: 18px;
+            font-size: 1.1em;
             margin-top: 10px;
+        }
+
+        label {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            max-width: 300px;
+            padding: 15px;
+            font-size: 1.1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 10px 0;
+            width: 100%;
+            text-align: left;
+        }
+
+        ul li {
+            font-size: 1.1em;
+            color: #333;
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
         }
     </style>
 </head>
 <body>
 
-    <div class="button-container">
-        <button id="hostBtn">Hébergeur</button>
-        <button id="playerBtn">Joueur</button>
-    </div>
-
-    <div id="codeContainer">
-        <p>Code d'hébergement : <span id="hostCode"></span></p>
-        <div id="playersListContainer">
-            <h3>Joueurs :</h3>
-            <ul id="playersList"></ul>
+    <div class="container">
+        <div class="button-container">
+            <button id="hostBtn">Hébergeur</button>
+            <button id="playerBtn">Joueur</button>
         </div>
-    </div>
 
-    <div id="playerContainer">
-        <label for="playerCode">Code :</label>
-        <input type="text" id="playerCode" placeholder="Entrez le code">
-        <button id="confirmBtn">Confirmer</button>
-        <p id="errorMsg"></p>
-    </div>
+        <div id="codeContainer">
+            <p>Code d'hébergement : <strong><span id="hostCode"></span></strong></p>
+            <div id="playersListContainer">
+                <h3>Joueurs connectés :</h3>
+                <ul id="playersList"></ul>
+            </div>
+        </div>
 
-    <div id="usernameContainer">
-        <label for="username">Pseudo :</label>
-        <input type="text" id="username" placeholder="Entrez votre pseudo">
-        <button id="submitUsernameBtn">Confirmer</button>
+        <div id="playerContainer">
+            <label for="playerCode">Code :</label>
+            <input type="text" id="playerCode" placeholder="Entrez le code">
+            <button id="confirmBtn">Confirmer</button>
+            <p id="errorMsg"></p>
+        </div>
+
+        <div id="usernameContainer">
+            <label for="username">Pseudo :</label>
+            <input type="text" id="username" placeholder="Entrez votre pseudo">
+            <button id="submitUsernameBtn">Confirmer</button>
+        </div>
     </div>
 
     <script>
