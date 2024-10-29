@@ -54,7 +54,7 @@
         }
 
         .chat-container {
-            width: 300px; /* Largeur du conteneur de chat */
+            width: 200px; /* Réduire la largeur du conteneur de chat */
             margin-right: 20px; /* Espace entre le chat et le reste */
         }
 
@@ -93,7 +93,7 @@
 
         #codeContainer, #playerContainer, #usernameContainer {
             display: none;
-            font-size: 1.2em;
+            font-size: 1.5em; /* Augmenter la taille de police pour le code et joueurs */
             margin-top: 20px;
             width: 100%;
         }
@@ -153,6 +153,18 @@
             border-radius: 5px;
             text-align: center; /* Centre le texte du chat */
         }
+
+        /* Style pour afficher le nom du joueur */
+        #finalPlayersListContainer {
+            display: none; /* Initialement caché */
+            text-align: center; /* Centrer le texte */
+        }
+
+        #finalPlayersList {
+            font-size: 3em; /* Taille de police plus grande pour le nom du joueur */
+            font-weight: bold; /* Met le texte en gras */
+            color: #333; /* Couleur du texte */
+        }
     </style>
 </head>
 <body>
@@ -190,7 +202,7 @@
                 <button id="submitUsernameBtn">Confirmer</button>
             </div>
 
-            <div id="finalPlayersListContainer" style="display: none;">
+            <div id="finalPlayersListContainer">
                 <h3>Nom du joueur :</h3> <!-- Modifié ici -->
                 <ul id="finalPlayersList"></ul> <!-- Nouvelle liste pour afficher les joueurs -->
             </div>
@@ -244,18 +256,18 @@
                 
                 await db.collection('Joueurs').doc(playerDocId).set({ username });
                 console.log(`Pseudo sauvegardé dans Firestore sous ${playerDocId} :`, username);
-                return username; // Retourne le pseudo pour l'affichage
+                
+                return username; // Retourne le pseudo sauvegardé
             } catch (error) {
-                console.error('Erreur lors de la sauvegarde du pseudo :', error);
+                console.error('Erreur lors de la sauvegarde du pseudo:', error);
             }
         }
 
-        // Affiche la liste des joueurs en temps réel
+        // Fonction pour afficher la liste des joueurs
         function displayPlayersList() {
             const playersListContainer = document.getElementById('playersList');
-            playersListContainer.innerHTML = ""; // Réinitialise la liste
+            playersListContainer.innerHTML = ''; // Vide la liste des joueurs
 
-            // Met en place un écouteur sur la collection "Joueurs"
             db.collection('Joueurs').onSnapshot((snapshot) => {
                 snapshot.forEach(doc => {
                     const li = document.createElement('li');
@@ -310,12 +322,13 @@
 
                 // Cacher tout sauf la liste des joueurs
                 document.querySelector('.container').innerHTML = ""; // Vide le conteneur
-                const playersListContainer = document.createElement('div');
-                playersListContainer.innerHTML = `<h3>Nom du joueur :</h3>
-                                                  <ul id="finalPlayersList">
-                                                      <li><strong>${savedUsername}</strong></li>
-                                                  </ul>`;
-                document.querySelector('.container').appendChild(playersListContainer);
+                const finalPlayersListContainer = document.createElement('div');
+                finalPlayersListContainer.id = 'finalPlayersListContainer';
+                finalPlayersListContainer.innerHTML = `<h3>Nom du joueur :</h3>
+                                                      <ul id="finalPlayersList">
+                                                          <li><strong>${savedUsername}</strong></li>
+                                                      </ul>`;
+                document.querySelector('.container').appendChild(finalPlayersListContainer);
                 
                 // Affiche la liste des autres joueurs
                 displayPlayersList();
