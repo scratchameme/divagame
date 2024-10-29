@@ -53,6 +53,7 @@
         }
 
         .chatContainer {
+            display: none; /* Masquer le conteneur de chat par défaut */
             width: 30%; /* Largeur du conteneur de chat */
             margin-right: 20px; /* Espacement entre le chat et le conteneur principal */
             background-color: #f9f9f9; /* Couleur de fond pour le chat */
@@ -244,7 +245,7 @@
                 
                 await db.collection('Joueurs').doc(playerDocId).set({ username });
                 console.log(`Pseudo sauvegardé dans Firestore sous ${playerDocId} :`, username);
-                return username; // Retourne le pseudo pour l'affichage
+                return username; // Retourne le pseudo sauvegardé
             } catch (error) {
                 console.error('Erreur lors de la sauvegarde du pseudo :', error);
             }
@@ -283,6 +284,9 @@
             await saveCodeToFirestore(code);
             document.getElementById('codeContainer').style.display = 'block';
             displayPlayersList(); // Affiche la liste des joueurs
+
+            // Afficher le conteneur de chat
+            document.querySelector('.chatContainer').style.display = 'flex'; // Affiche le chat
         };
 
         document.getElementById('playerBtn').onclick = function() {
