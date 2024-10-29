@@ -100,11 +100,17 @@
             }
         }
 
-        // Fonction pour sauvegarder le pseudo dans Firestore
+        // Fonction pour sauvegarder le pseudo dans la collection "Joueurs" avec nom incrémenté
         async function saveUsernameToFirestore(username) {
             try {
-                await db.collection('hostCodes').doc('Names').collection('players').add({ username });
-                console.log('Pseudo sauvegardé dans Firestore :', username);
+                // Récupère le nombre actuel de documents dans la collection "Joueurs"
+                const playersSnapshot = await db.collection('Joueurs').get();
+                const playerCount = playersSnapshot.size + 1; // Incrémentation pour le nouveau joueur
+                const playerDocId = `Player${playerCount}`;
+
+                // Sauvegarde le pseudo avec un nom de document incrémenté
+                await db.collection('Joueurs').doc(playerDocId).set({ username });
+                console.log(`Pseudo sauvegardé dans Firestore sous ${playerDocId} :`, username);
             } catch (error) {
                 console.error('Erreur lors de la sauvegarde du pseudo :', error);
             }
