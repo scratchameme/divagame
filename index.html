@@ -62,12 +62,12 @@
     </div>
 
     <script>
-        // Génération d'un code aléatoire de 6 caractères
+        // Génération d'un code aléatoire de 3 chiffres
         function generateRandomCode() {
-            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            const digits = '0123456789';
             let code = '';
-            for (let i = 0; i < 6; i++) {
-                code += characters.charAt(Math.floor(Math.random() * characters.length));
+            for (let i = 0; i < 3; i++) {
+                code += digits.charAt(Math.floor(Math.random() * digits.length));
             }
             return code;
         }
