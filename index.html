@@ -250,7 +250,6 @@
                 const playerDocId = `Player${playerCount}`;
                 
                 await db.collection('Joueurs').doc(playerDocId).set({ username });
-                console.log('Pseudo sauvegardé dans Firestore :', username);
                 return username; // Retourne le pseudo sauvegardé
             } catch (error) {
                 console.error('Erreur lors de la sauvegarde du pseudo:', error);
@@ -314,15 +313,12 @@
             if (username) {
                 const savedUsername = await saveUsernameToFirestore(username);
 
-                // Cacher tout sauf la liste des joueurs
+                // Cacher tout sauf le nom du joueur
                 document.querySelector('.container').innerHTML = ""; // Vide le conteneur
-                const finalPlayersListContainer = document.createElement('div');
-                finalPlayersListContainer.id = 'finalPlayersListContainer';
-                finalPlayersListContainer.innerHTML = `<h3>Nom du joueur :</h3>
-                                                      <ul id="finalPlayersList">
-                                                          <li><strong>${savedUsername}</strong></li>
-                                                      </ul>`;
-                document.querySelector('.container').appendChild(finalPlayersListContainer);
+                const finalPlayersListContainer = document.getElementById('finalPlayersListContainer');
+                finalPlayersListContainer.style.display = 'block'; // Affiche le conteneur avec le nom du joueur
+                const finalPlayersList = document.getElementById('finalPlayersList');
+                finalPlayersList.innerHTML = `<li><strong>${savedUsername}</strong></li>`; // Affiche le nom du joueur
                 
                 // Affiche la liste des autres joueurs
                 displayPlayersList();
