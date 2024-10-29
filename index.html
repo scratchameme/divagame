@@ -34,7 +34,7 @@
             height: 100vh;
             font-family: Arial, sans-serif;
         }
-        .button-container, #codeContainer, #playerContainer {
+        .button-container, #codeContainer, #playerContainer, #usernameContainer {
             text-align: center;
         }
         button {
@@ -43,10 +43,15 @@
             font-size: 16px;
             cursor: pointer;
         }
-        #codeContainer, #playerContainer {
+        #codeContainer, #playerContainer, #usernameContainer {
             display: none;
             font-size: 24px;
             margin-top: 20px;
+        }
+        #errorMsg {
+            color: red;
+            font-size: 18px;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -65,6 +70,13 @@
         <label for="playerCode">Code :</label>
         <input type="text" id="playerCode" placeholder="Entrez le code">
         <button id="confirmBtn">Confirmer</button>
+        <p id="errorMsg"></p>
+    </div>
+
+    <div id="usernameContainer">
+        <label for="username">Pseudo :</label>
+        <input type="text" id="username" placeholder="Entrez votre pseudo">
+        <button id="submitUsernameBtn">Confirmer</button>
     </div>
 
     <script>
@@ -85,6 +97,16 @@
                 console.log('Code sauvegardé dans Firestore :', code);
             } catch (error) {
                 console.error('Erreur lors de la sauvegarde du code:', error);
+            }
+        }
+
+        // Fonction pour sauvegarder le pseudo dans Firestore
+        async function saveUsernameToFirestore(username) {
+            try {
+                await db.collection('hostCodes').doc('Names').collection('players').add({ username });
+                console.log('Pseudo sauvegardé dans Firestore :', username);
+            } catch (error) {
+                console.error('Erreur lors de la sauvegarde du pseudo :', error);
             }
         }
 
@@ -109,6 +131,7 @@
         // Vérification du code entré
         document.getElementById('confirmBtn').onclick = async function() {
             const enteredCode = document.getElementById('playerCode').value;
+            const errorMsg = document.getElementById('errorMsg');
 
             // Récupère le code dans Firestore
             try {
@@ -117,14 +140,31 @@
                     const storedCode = doc.data().code;
                     if (enteredCode === storedCode) {
                         console.log("code bon");
+                        errorMsg.textContent = ""; // Efface le message d'erreur
+                        document.getElementById('playerContainer').style.display = 'none';
+                        document.getElementById('usernameContainer').style.display = 'block';
                     } else {
-                        console.log("code mauvais");
+                        errorMsg.textContent = "Mauvais code";
                     }
                 } else {
                     console.log("Aucun code trouvé dans Firestore");
+                    errorMsg.textContent = "Aucun code trouvé";
                 }
             } catch (error) {
                 console.error("Erreur lors de la récupération du code :", error);
+                errorMsg.textContent = "Erreur de connexion";
+            }
+        };
+
+        // Enregistrement du pseudo
+        document.getElementById('submitUsernameBtn').onclick = async function() {
+            const username = document.getElementById('username').value;
+            if (username) {
+                await saveUsernameToFirestore(username);
+                document.getElementById('usernameContainer').style.display = 'none';
+                console.log("Pseudo enregistré avec succès :", username);
+            } else {
+                alert("Veuillez entrer un pseudo");
             }
         };
     </script>
