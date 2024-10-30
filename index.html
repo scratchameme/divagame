@@ -109,6 +109,16 @@
         return code;
     }
 
+    async function clearMessagesCollection() {
+        const messagesSnapshot = await db.collection('Messages').get();
+        const batch = db.batch();
+        messagesSnapshot.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+        await batch.commit();
+        console.log('Tous les messages ont été supprimés de la collection "Messages".');
+    }
+
     async function clearPlayersCollection() {
         const playersSnapshot = await db.collection('Joueurs').get();
         const batch = db.batch();
@@ -116,7 +126,7 @@
             batch.delete(doc.ref);
         });
         await batch.commit();
-        console.log('Tous les documents de la collection "Joueurs" ont été supprimés.');
+        console.log('Tous les joueurs ont été supprimés de la collection "Joueurs".');
     }
 
     async function saveCodeToFirestore(code) {
@@ -162,13 +172,13 @@
 
     function displayMessages(messages) {
         const messagesList = document.getElementById('messagesList');
-        messagesList.innerHTML = ''; // Réinitialise les messages
+        messagesList.innerHTML = ''; // Vider les messages précédents
 
         messages.forEach(msg => {
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message';
             messageDiv.textContent = msg.message;
-            messagesList.prepend(messageDiv); // Ajoute le message au début pour que les nouveaux apparaissent en haut
+            messagesList.prepend(messageDiv); // Ajoute le message au début
         });
         
         // Limiter la hauteur du conteneur
@@ -176,63 +186,75 @@
         chatContainer.scrollTop = chatContainer.scrollHeight; // Défiler vers le bas
     }
 
+    // Écouteur de snapshot pour les messages
     db.collection('Messages').orderBy('timestamp', 'asc').onSnapshot(snapshot => {
         const messages = snapshot.docs.map(doc => doc.data());
         displayMessages(messages);
     });
 
-    document.getElementById('hostBtn').addEventListener('click', () => {
+    document.getElementById('hostBtn').addEventListener('click', async () => {
         const code = generateRandomCode();
         document.getElementById('hostCode').textContent = code;
-        saveCodeToFirestore(code);
-        document.getElementById('chatContainer').style.display = 'block'; // Afficher le chat uniquement pour l'hébergeur
-        document.getElementById('messagesList').innerHTML = ''; // Réinitialise les messages
-        document.querySelector('.button-container').style.display = 'none';
+        await clearMessagesCollection(); // Effacer les messages avant de commencer un nouveau chat
+        await saveCodeToFirestore(code);
         document.getElementById('codeContainer').style.display = 'block';
+        document.getElementById('chatContainer').style.display = 'block';
     });
 
     document.getElementById('playerBtn').addEventListener('click', () => {
-        document.querySelector('.button-container').style.display = 'none';
         document.getElementById('playerContainer').style.display = 'block';
+        document.getElementById('chatContainer').style.display = 'block';
     });
 
     document.getElementById('confirmBtn').addEventListener('click', async () => {
         const playerCode = document.getElementById('playerCode').value;
-        const codeSnapshot = await db.collection('hostCodes').doc('codes').get();
-
-        if (codeSnapshot.exists && codeSnapshot.data().code === playerCode) {
-            document.getElementById('playerContainer').style.display = 'none';
-            document.getElementById('usernameContainer').style.display = 'block';
-            document.getElementById('errorMsg').textContent = '';
+        const hostCodeDoc = await db.collection('hostCodes').doc('codes').get();
+        
+        if (hostCodeDoc.exists && hostCodeDoc.data().code === playerCode) {
+            const username = document.getElementById('username').value;
+            currentPlayerDocId = await saveUsernameToFirestore(username);
+            document.getElementById('usernameContainer').style.display = 'none';
+            document.getElementById('finalPlayersListContainer').style.display = 'block';
+            displayPlayersList();
         } else {
-            document.getElementById('errorMsg').textContent = 'Code incorrect, veuillez réessayer.';
+            document.getElementById('errorMsg').textContent = 'Code incorrect !';
         }
     });
 
     document.getElementById('submitUsernameBtn').addEventListener('click', async () => {
         const username = document.getElementById('username').value;
-        if (username) {
-            currentPlayerDocId = await saveUsernameToFirestore(username);
-            if (currentPlayerDocId) {
-                const finalPlayersListContainer = document.getElementById('finalPlayersListContainer');
-                const finalPlayersList = document.getElementById('finalPlayersList');
-                finalPlayersList.innerHTML = '';
-                const li = document.createElement('li');
-                li.textContent = username;
-                finalPlayersList.appendChild(li);
-                finalPlayersListContainer.style.display = 'block';
-                document.getElementById('usernameContainer').style.display = 'none';
-            }
-        }
+        currentPlayerDocId = await saveUsernameToFirestore(username);
+        document.getElementById('usernameContainer').style.display = 'none';
+        document.getElementById('finalPlayersListContainer').style.display = 'block';
+        displayPlayersList();
     });
 
-    document.getElementById('sendMessageBtn').addEventListener('click', () => {
-        const message = document.getElementById('playerMessage').value;
-        if (message) {
-            saveMessageToFirestore(message);
-            document.getElementById('playerMessage').value = '';
-        }
+    document.getElementById('sendMessageBtn').addEventListener('click', async () => {
+        const messageInput = document.getElementById('playerMessage');
+        const message = messageInput.value;
+        await saveMessageToFirestore(message);
+        messageInput.value = ''; // Vider le champ de message
     });
+
+    async function displayPlayersList() {
+        const playersSnapshot = await db.collection('Joueurs').get();
+        const playersList = document.getElementById('playersList');
+        playersList.innerHTML = '';
+
+        playersSnapshot.forEach(doc => {
+            const li = document.createElement('li');
+            li.textContent = doc.data().username;
+            playersList.appendChild(li);
+        });
+
+        const finalPlayersList = document.getElementById('finalPlayersList');
+        finalPlayersList.innerHTML = '';
+        playersSnapshot.forEach(doc => {
+            const li = document.createElement('li');
+            li.textContent = doc.data().username;
+            finalPlayersList.appendChild(li);
+        });
+    }
 </script>
 
 </body>
