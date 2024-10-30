@@ -174,13 +174,15 @@
 
     async function displayPlayersList() {
         const playersList = document.getElementById('playersList');
-        playersList.innerHTML = '';
+        playersList.innerHTML = ''; // Vide la liste actuelle
+
         const playersSnapshot = await db.collection('Joueurs').get();
         playersSnapshot.forEach(doc => {
             const li = document.createElement('li');
-            li.textContent = doc.data().username;
+            li.textContent = doc.data().username; // Affiche le pseudo du joueur
             playersList.appendChild(li);
         });
+
         // Si la liste des joueurs est vide, ajouter un message
         if (playersList.children.length === 0) {
             const emptyMessage = document.createElement('li');
@@ -248,23 +250,25 @@
         }
     });
 
-        document.getElementById('submitUsernameBtn').addEventListener('click', async () => {
-            const username = document.getElementById('username').value;
-            if (username) {
-                currentPlayerDocId = await saveUsernameToFirestore(username);
-                if (currentPlayerDocId) {
-                    const finalPlayersListContainer = document.getElementById('finalPlayersListContainer');
-                    const finalPlayersList = document.getElementById('finalPlayersList');
-                    finalPlayersList.innerHTML = '';
-                    const li = document.createElement('li');
-                    li.textContent = username;
-                    finalPlayersList.appendChild(li);
-                    finalPlayersListContainer.style.display = 'block';
-                    document.getElementById('usernameContainer').style.display = 'none';
-                    document.getElementById('chatContainer').style.display = 'flex';
-                }
+    document.getElementById('submitUsernameBtn').addEventListener('click', async () => {
+        const username = document.getElementById('username').value;
+        if (username) {
+            currentPlayerDocId = await saveUsernameToFirestore(username);
+            if (currentPlayerDocId) {
+                const finalPlayersListContainer = document.getElementById('finalPlayersListContainer');
+                const finalPlayersList = document.getElementById('finalPlayersList');
+                finalPlayersList.innerHTML = '';
+                const li = document.createElement('li');
+                li.textContent = username;
+                finalPlayersList.appendChild(li);
+                finalPlayersListContainer.style.display = 'block';
+                document.getElementById('usernameContainer').style.display = 'none';
+
+                // Appel de displayPlayersList pour mettre à jour la liste des joueurs sur l'écran de l'hébergeur
+                await displayPlayersList();
             }
-        });
+        }
+    });
 
     document.getElementById('sendMessageBtn').addEventListener('click', async () => {
         const message = document.getElementById('playerMessage').value;
