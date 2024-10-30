@@ -181,6 +181,7 @@ async function saveMessageToFirestore(message) {
     } catch (error) {
         console.error('Erreur lors de la sauvegarde du message:', error);
     }
+}
     
     async function displayMessages() {
         const chatContainer = document.getElementById('chatContainer');
