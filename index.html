@@ -43,9 +43,9 @@
         }
 
         .container {
-            display: flex; /* Changement ici pour utiliser Flexbox */
+            display: flex;
             width: 100%;
-            max-width: 800px; /* Largeur maximale de la conteneur */
+            max-width: 800px;
             padding: 20px;
             background-color: #ffffff;
             box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
@@ -53,19 +53,19 @@
         }
 
         .chat-container {
-            width: 200px; /* Largeur fixée du conteneur de chat */
-            height: 350px; /* Hauteur fixée du conteneur de chat */
-            margin-right: 20px; /* Espace entre le chat et le reste */
-            border: 1px solid #ccc; /* Bordure grise */
+            width: 200px;
+            height: 350px;
+            margin-right: 20px;
+            border: 1px solid #ccc;
             border-radius: 5px;
-            padding: 10px; /* Espacement intérieur */
-            overflow-y: auto; /* Permet de faire défiler le contenu */
-            background-color: #f0f0f5; /* Couleur de fond du chat */
-            display: none; /* Caché par défaut */
+            padding: 10px;
+            overflow-y: auto;
+            background-color: #f0f0f5;
+            display: none;
         }
 
         .main-container {
-            flex-grow: 1; /* Prend tout l'espace restant */
+            flex-grow: 1;
         }
 
         h3 {
@@ -99,7 +99,7 @@
 
         #codeContainer, #playerContainer, #usernameContainer {
             display: none;
-            font-size: 1.5em; /* Augmenter la taille de police pour le code et joueurs */
+            font-size: 1.5em;
             margin-top: 20px;
             width: 100%;
         }
@@ -116,7 +116,7 @@
             margin-bottom: 8px;
         }
 
-        input[type="text"] {
+        input[type="text"], textarea {
             width: 100%;
             max-width: 300px;
             padding: 15px;
@@ -131,34 +131,42 @@
             padding: 0;
             margin: 10px 0;
             width: 100%;
-            text-align: center; /* Centrer les noms des joueurs */
+            text-align: center;
         }
 
         ul li {
-            font-size: 1.5em; /* Augmenter la taille de police pour les noms */
+            font-size: 1.5em;
             color: #333;
             padding: 5px 0;
             border-bottom: 1px solid #eee;
         }
 
-        /* Nouveau style pour le code */
         #hostCode {
-            font-size: 3em; /* Taille de police encore plus grande pour le code */
-            font-weight: bold; /* Met le texte en gras */
-            color: #4CAF50; /* Change la couleur pour la rendre plus visible */
-            text-align: center; /* Centre le code */
+            font-size: 3em;
+            font-weight: bold;
+            color: #4CAF50;
+            text-align: center;
         }
 
-        /* Style pour afficher le nom du joueur */
         #finalPlayersListContainer {
-            display: none; /* Initialement caché */
-            text-align: center; /* Centrer le texte */
+            display: none;
+            text-align: center;
         }
 
         #finalPlayersList {
-            font-size: 3em; /* Taille de police plus grande pour le nom du joueur */
-            font-weight: bold; /* Met le texte en gras */
-            color: #333; /* Couleur du texte */
+            font-size: 3em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        /* Styles pour le chat */
+        #chatLabel {
+            font-size: 1.3em;
+            margin-top: 20px;
+        }
+
+        #chatContainer {
+            display: none;
         }
     </style>
 </head>
@@ -166,8 +174,8 @@
 
     <div class="container">
         <div class="chat-container" id="chatContainer">
-            <h3>Chat</h3> <!-- Titre du chat -->
-            <p>Le chat apparaîtra ici.</p> <!-- Texte de l'espace de chat -->
+            <h3>Chat</h3>
+            <p>Le chat apparaîtra ici.</p>
         </div>
 
         <div class="main-container">
@@ -198,8 +206,15 @@
             </div>
 
             <div id="finalPlayersListContainer">
-                <h3>Nom du joueur :</h3> <!-- Modifié ici -->
-                <ul id="finalPlayersList"></ul> <!-- Nouvelle liste pour afficher les joueurs -->
+                <h3>Nom du joueur :</h3>
+                <ul id="finalPlayersList"></ul>
+
+                <!-- Zone de chat -->
+                <div id="chatContainer">
+                    <p id="chatLabel">Chat</p>
+                    <textarea id="chatMessage" placeholder="Tapez votre message..."></textarea>
+                    <button id="sendChatBtn">Envoyer</button>
+                </div>
             </div>
         </div>
     </div>
@@ -215,7 +230,6 @@
             return code;
         }
 
-        // Fonction pour supprimer tous les documents de la collection "Joueurs"
         async function clearPlayersCollection() {
             const playersSnapshot = await db.collection('Joueurs').get();
             const batch = db.batch();
@@ -226,23 +240,17 @@
             console.log('Tous les documents de la collection "Joueurs" ont été supprimés.');
         }
 
-        // Fonction pour sauvegarder le code dans Firestore en utilisant un document unique
         async function saveCodeToFirestore(code) {
             try {
-                // Supprime tous les joueurs avant de sauvegarder un nouveau code
                 await clearPlayersCollection();
-
                 await db.collection('hostCodes').doc('codes').set({ code });
                 console.log('Code sauvegardé dans Firestore :', code);
-
-                // Affiche la liste des joueurs en temps réel
                 displayPlayersList();
             } catch (error) {
                 console.error('Erreur lors de la sauvegarde du code:', error);
             }
         }
 
-        // Fonction pour sauvegarder le pseudo dans la collection "Joueurs" avec nom incrémenté
         async function saveUsernameToFirestore(username) {
             try {
                 const playersSnapshot = await db.collection('Joueurs').get();
@@ -251,44 +259,39 @@
                 
                 await db.collection('Joueurs').doc(playerDocId).set({ username });
                 console.log('Pseudo sauvegardé dans Firestore :', username);
-                return username; // Retourne le pseudo sauvegardé
+                return playerDocId;
             } catch (error) {
                 console.error('Erreur lors de la sauvegarde du pseudo:', error);
-                return null; // Retourne null en cas d'erreur
+                return null;
             }
         }
 
-        // Fonction pour afficher la liste des joueurs
         async function displayPlayersList() {
             const playersList = document.getElementById('playersList');
-            playersList.innerHTML = ''; // Réinitialiser la liste avant d'ajouter
-
+            playersList.innerHTML = '';
             const playersSnapshot = await db.collection('Joueurs').get();
             playersSnapshot.forEach(doc => {
                 const li = document.createElement('li');
-                li.textContent = doc.data().username; // Affiche le pseudo
+                li.textContent = doc.data().username;
                 playersList.appendChild(li);
             });
         }
 
-        // Affichage de la liste des joueurs en temps réel
         db.collection('Joueurs').onSnapshot(displayPlayersList);
+
+        let currentPlayerDocId = null;
 
         document.getElementById('hostBtn').addEventListener('click', async () => {
             const code = generateRandomCode();
             document.getElementById('hostCode').textContent = code;
             document.getElementById('codeContainer').style.display = 'block';
-            document.getElementById('chatContainer').style.display = 'block'; // Afficher le chat
+            document.getElementById('chatContainer').style.display = 'block';
             await saveCodeToFirestore(code);
-
-            // Cacher les boutons
             document.querySelector('.button-container').style.display = 'none';
         });
 
         document.getElementById('playerBtn').addEventListener('click', () => {
             document.getElementById('playerContainer').style.display = 'block';
-
-            // Cacher les boutons
             document.querySelector('.button-container').style.display = 'none';
         });
 
@@ -299,7 +302,7 @@
 
             if (playerCode === savedCode) {
                 document.getElementById('usernameContainer').style.display = 'block';
-                document.getElementById('playerContainer').style.display = 'none'; // Cacher le conteneur de code
+                document.getElementById('playerContainer').style.display = 'none';
                 document.getElementById('errorMsg').textContent = '';
             } else {
                 document.getElementById('errorMsg').textContent = 'Code incorrect, veuillez réessayer.';
@@ -309,19 +312,30 @@
         document.getElementById('submitUsernameBtn').addEventListener('click', async () => {
             const username = document.getElementById('username').value;
             if (username) {
-                const savedUsername = await saveUsernameToFirestore(username);
-                if (savedUsername) {
-                    // Afficher le pseudo confirmé
+                currentPlayerDocId = await saveUsernameToFirestore(username);
+                if (currentPlayerDocId) {
                     const finalPlayersListContainer = document.getElementById('finalPlayersListContainer');
                     const finalPlayersList = document.getElementById('finalPlayersList');
-                    finalPlayersList.innerHTML = ''; // Réinitialiser la liste
+                    finalPlayersList.innerHTML = '';
                     const li = document.createElement('li');
-                    li.textContent = savedUsername; // Affiche le pseudo confirmé
+                    li.textContent = username;
                     finalPlayersList.appendChild(li);
-                    finalPlayersListContainer.style.display = 'block'; // Afficher la liste des joueurs
-
-                    // Cacher le conteneur de pseudo
+                    finalPlayersListContainer.style.display = 'block';
                     document.getElementById('usernameContainer').style.display = 'none';
+                    document.getElementById('chatContainer').style.display = 'block';
+                }
+            }
+        });
+
+        document.getElementById('sendChatBtn').addEventListener('click', async () => {
+            const chatMessage = document.getElementById('chatMessage').value;
+            if (chatMessage && currentPlayerDocId) {
+                try {
+                    await db.collection('Joueurs').doc(currentPlayerDocId).update({ message: chatMessage });
+                    console.log('Message sauvegardé :', chatMessage);
+                    document.getElementById('chatMessage').value = ''; // Effacer le message après envoi
+                } catch (error) {
+                    console.error('Erreur lors de la sauvegarde du message:', error);
                 }
             }
         });
