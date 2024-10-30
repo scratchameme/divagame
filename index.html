@@ -223,8 +223,8 @@
                     username: currentPlayerUsername,
                     message: message,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()  // Ajoute un timestamp
-                await enforceMessageLimit(); // Vérifie la limite des messages
                 });
+                await enforceMessageLimit(); // Vérifie la limite des messages
                 console.log('Message sauvegardé dans Firestore :', message);
             }
         } catch (error) {
