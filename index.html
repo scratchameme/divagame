@@ -50,7 +50,7 @@
 <body>
 
 <div class="container">
-    <div class="chat-container" id="chatContainer">
+    <div class="chat-container" id="chatContainer" style="display: none;"> <!-- Caché par défaut -->
         <h3>Chat</h3>
         <ul id="messagesList">
             <p>Aucun message</p>
@@ -135,7 +135,7 @@
             await clearMessagesCollection(); // Supprime les messages avant de sauvegarder le code
             await db.collection('hostCodes').doc('codes').set({ code });
             console.log('Code sauvegardé dans Firestore :', code);
-            displayPlayersList(); // Assurez-vous que cette fonction existe
+            displayPlayersList(); // Affiche la liste des joueurs
         } catch (error) {
             console.error('Erreur lors de la sauvegarde du code:', error);
         }
@@ -264,7 +264,7 @@
                 finalPlayersListContainer.style.display = 'block';
                 document.getElementById('usernameContainer').style.display = 'none';
 
-                // Appel de displayPlayersList pour mettre à jour la liste des joueurs
+                // Appel de displayPlayersList pour mettre à jour la liste des joueurs sur l'écran de l'hébergeur
                 await displayPlayersList();
             }
         }
