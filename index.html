@@ -145,7 +145,7 @@
         try {
             const playersSnapshot = await db.collection('Joueurs').get();
             const playerCount = playersSnapshot.size + 1;
-            const playerDocId = Player${playerCount};
+            const playerDocId = `Player${playerCount}`;
             
             await db.collection('Joueurs').doc(playerDocId).set({ username });
             console.log('Pseudo sauvegardé dans Firestore :', username);
@@ -200,7 +200,7 @@
 
         messagesSnapshot.forEach(doc => {
             const li = document.createElement('li');
-            li.textContent = ${doc.data().username}: ${doc.data().message}; // Affiche le message avec le nom d'utilisateur
+            li.textContent = `${doc.data().username}: ${doc.data().message}`; // Affiche le message avec le nom d'utilisateur
             messagesList.appendChild(li);
         });
 
