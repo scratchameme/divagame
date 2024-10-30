@@ -99,8 +99,14 @@
         <div id="usernameContainer">
             <label for="username">Pseudo :</label>
             <input type="text" id="username" placeholder="Entrez votre pseudo">
+            
+            <!-- Ajoutez un sélecteur de couleur -->
+            <label for="colorPicker">Couleur :</label>
+            <input type="color" id="colorPicker" value="#000000">
+            
             <button id="submitUsernameBtn">Confirmer</button>
         </div>
+
 
         <div id="finalPlayersListContainer">
             <h3>Nom du joueur :</h3>
@@ -157,9 +163,17 @@
             const playersSnapshot = await db.collection('Joueurs').get();
             const playerCount = playersSnapshot.size + 1;
             const playerDocId = `Player${playerCount}`;
-            
-            await db.collection('Joueurs').doc(playerDocId).set({ username });
-            console.log('Pseudo sauvegardé dans Firestore :', username);
+    
+            // Récupère la couleur choisie par le joueur
+            const color = document.getElementById('colorPicker').value;
+    
+            // Sauvegarde le pseudo et la couleur
+            await db.collection('Joueurs').doc(playerDocId).set({ 
+                username: username, 
+                color: color 
+            });
+    
+            console.log('Pseudo et couleur sauvegardés dans Firestore :', username, color);
             currentPlayerUsername = username; // Définit le pseudo pour sauvegarder le message
             return playerDocId;
         } catch (error) {
@@ -167,21 +181,21 @@
             return null;
         }
     }
-
-async function saveMessageToFirestore(message) {
-    try {
-        if (currentPlayerUsername && message) {
-            await db.collection('Messages').add({
-                username: currentPlayerUsername,
-                message: message,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()  // Ajoute un timestamp
-            });
-            console.log('Message sauvegardé dans Firestore :', message);
+    
+    async function saveMessageToFirestore(message) {
+        try {
+            if (currentPlayerUsername && message) {
+                await db.collection('Messages').add({
+                    username: currentPlayerUsername,
+                    message: message,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()  // Ajoute un timestamp
+                });
+                console.log('Message sauvegardé dans Firestore :', message);
+            }
+        } catch (error) {
+            console.error('Erreur lors de la sauvegarde du message:', error);
         }
-    } catch (error) {
-        console.error('Erreur lors de la sauvegarde du message:', error);
     }
-}
     
     async function displayMessages() {
         const chatContainer = document.getElementById('chatContainer');
@@ -192,13 +206,13 @@ async function saveMessageToFirestore(message) {
             snapshot.forEach(doc => {
                 const messageData = doc.data();
                 const messageElement = document.createElement('p');
-                messageElement.innerHTML = `<strong>${messageData.username}:</strong> ${messageData.message}`;
+    
+                // Applique la couleur de l'utilisateur si elle est disponible
+                messageElement.innerHTML = `<strong style="color: ${messageData.color || '#000000'};">${messageData.username}:</strong> ${messageData.message}`;
                 chatContainer.appendChild(messageElement);
             });
         });
     }
-
-
 
     async function displayPlayersList() {
         const playersList = document.getElementById('playersList');
@@ -206,7 +220,12 @@ async function saveMessageToFirestore(message) {
         const playersSnapshot = await db.collection('Joueurs').get();
         playersSnapshot.forEach(doc => {
             const li = document.createElement('li');
-            li.textContent = doc.data().username;
+            const data = doc.data();
+            li.textContent = data.username;
+    
+            // Applique la couleur enregistrée au nom du joueur
+            li.style.color = data.color || '#000000';  // Couleur par défaut noire si non définie
+    
             playersList.appendChild(li);
         });
     }
@@ -259,23 +278,28 @@ async function saveMessageToFirestore(message) {
 
     document.getElementById('submitUsernameBtn').addEventListener('click', async () => {
         const username = document.getElementById('username').value;
+        const color = document.getElementById('colorPicker').value; // Récupère la couleur
+    
         if (username) {
             currentPlayerDocId = await saveUsernameToFirestore(username);
+    
             if (currentPlayerDocId) {
                 const finalPlayersListContainer = document.getElementById('finalPlayersListContainer');
                 const finalPlayersList = document.getElementById('finalPlayersList');
                 finalPlayersList.innerHTML = '';
+    
                 const li = document.createElement('li');
                 li.textContent = username;
+                li.style.color = color;  // Applique la couleur sélectionnée
                 finalPlayersList.appendChild(li);
+    
                 finalPlayersListContainer.style.display = 'block';
                 document.getElementById('usernameContainer').style.display = 'none';
                 
-                displayMessages();  // Appel de la fonction pour afficher les messages
+                displayMessages();
             }
         }
     });
-
 
     document.getElementById('sendMessageBtn').addEventListener('click', () => {
         const message = document.getElementById('playerMessage').value;
