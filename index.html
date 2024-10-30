@@ -145,8 +145,11 @@
         }
     }
 
-    async function saveMessageToFirestore(message, username) {
+    async function saveMessageToFirestore(message, playerDocId) {
         try {
+            const playerSnapshot = await db.collection('Joueurs').doc(playerDocId).get();
+            const username = playerSnapshot.data().username; // Récupère le nom d'utilisateur correspondant
+
             await db.collection('Messages').add({
                 message: message,
                 username: username,
@@ -173,14 +176,14 @@
 
     async function displayMessages() {
         const messagesList = document.getElementById('messagesList');
-        messagesList.innerHTML = '';
+        messagesList.innerHTML = ''; // Vide la liste actuelle
 
         const messagesSnapshot = await db.collection('Messages').orderBy('timestamp', 'desc').limit(6).get();
 
         messagesSnapshot.forEach(doc => {
             const li = document.createElement('li');
-            li.textContent = `${doc.data().username}: ${doc.data().message}`;
-            messagesList.prepend(li); // Ajoute chaque message en haut de la liste
+            li.textContent = `${doc.data().username}: ${doc.data().message}`; // Affiche le message avec le nom d'utilisateur
+            messagesList.appendChild(li);
         });
 
         // Ajouter un message vide si aucun message n'existe
@@ -243,6 +246,9 @@
                 finalPlayersList.appendChild(li);
                 finalPlayersListContainer.style.display = 'block';
                 document.getElementById('usernameContainer').style.display = 'none';
+                
+                // Appel de displayPlayersList pour mettre à jour la liste des joueurs
+                await displayPlayersList();
             }
         }
     });
