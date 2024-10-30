@@ -231,7 +231,7 @@
             snapshot.forEach(doc => {
                 const messageData = doc.data();
                 const messageElement = document.createElement('p');
-                messageElement.innerHTML = <strong style="color: ${messageData.color || '#000000'};">${messageData.username}:</strong> ${messageData.message};
+                messageElement.innerHTML = `<strong style="color: ${messageData.color || '#000000'};">${messageData.username}:</strong> ${messageData.message}`;
                 chatContainer.appendChild(messageElement);
             });
         });
