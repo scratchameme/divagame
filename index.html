@@ -29,7 +29,8 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: Arial, sans-serif; background-color: #f0f0f5; }
         .container { display: flex; width: 100%; max-width: 800px; padding: 20px; background-color: #ffffff; box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); border-radius: 10px; }
-        .chat-container { display: none; width: 200px; height: 350px; margin-right: 20px; border: 1px solid #ccc; border-radius: 5px; padding: 10px; overflow-y: auto; background-color: #f0f0f5; }
+        .chat-container { display: none; width: 200px; height: 350px; margin-right: 20px; border: 1px solid #ccc; border-radius: 5px; padding: 10px; overflow-y: hidden; background-color: #f0f0f5; position: relative; }
+        .message { padding: 5px; border-bottom: 1px solid #eee; margin-bottom: 5px; }
         .main-container { flex-grow: 1; }
         h3 { margin-top: 20px; font-size: 1.5em; color: #333; }
         button { padding: 10px 20px; font-size: 1.2em; cursor: pointer; background-color: #4CAF50; color: #fff; border: none; border-radius: 5px; transition: background-color 0.3s ease; }
@@ -53,7 +54,7 @@
 <div class="container">
     <div class="chat-container" id="chatContainer">
         <h3>Chat</h3>
-        <p>Le chat apparaîtra ici.</p>
+        <div id="messagesList"></div>
     </div>
 
     <div class="main-container">
@@ -147,7 +148,11 @@
     async function saveMessageToFirestore(message) {
         try {
             if (currentPlayerDocId && message) {
-                await db.collection('Joueurs').doc(currentPlayerDocId).update({ message });
+                await db.collection('Messages').add({
+                    playerId: currentPlayerDocId,
+                    message: message,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
                 console.log('Message sauvegardé dans Firestore :', message);
             }
         } catch (error) {
@@ -155,38 +160,45 @@
         }
     }
 
-    async function displayPlayersList() {
-        const playersList = document.getElementById('playersList');
-        playersList.innerHTML = '';
-        const playersSnapshot = await db.collection('Joueurs').get();
-        playersSnapshot.forEach(doc => {
-            const li = document.createElement('li');
-            li.textContent = doc.data().username;
-            playersList.appendChild(li);
+    function displayMessages(messages) {
+        const messagesList = document.getElementById('messagesList');
+        messagesList.innerHTML = '';
+
+        messages.forEach(msg => {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.textContent = msg.message;
+            messagesList.prepend(messageDiv); // Ajoute le message au début pour que les nouveaux apparaissent en haut
         });
+        
+        // Limiter la hauteur du conteneur
+        const chatContainer = document.getElementById('chatContainer');
+        chatContainer.scrollTop = chatContainer.scrollHeight; // Défiler vers le bas
     }
 
-    db.collection('Joueurs').onSnapshot(displayPlayersList);
+    db.collection('Messages').orderBy('timestamp', 'asc').onSnapshot(snapshot => {
+        const messages = snapshot.docs.map(doc => doc.data());
+        displayMessages(messages);
+    });
 
-    document.getElementById('hostBtn').addEventListener('click', async () => {
+    document.getElementById('hostBtn').addEventListener('click', () => {
         const code = generateRandomCode();
         document.getElementById('hostCode').textContent = code;
-        document.getElementById('codeContainer').style.display = 'block';
-        await saveCodeToFirestore(code);
+        saveCodeToFirestore(code);
+        document.getElementById('chatContainer').style.display = 'block'; // Afficher le chat uniquement pour l'hébergeur
         document.querySelector('.button-container').style.display = 'none';
-        
-        document.getElementById('chatContainer').style.display = 'block';
+        document.getElementById('codeContainer').style.display = 'block';
     });
 
     document.getElementById('playerBtn').addEventListener('click', () => {
-        document.getElementById('playerContainer').style.display = 'block';
         document.querySelector('.button-container').style.display = 'none';
+        document.getElementById('playerContainer').style.display = 'block';
     });
 
     document.getElementById('confirmBtn').addEventListener('click', async () => {
         const playerCode = document.getElementById('playerCode').value;
         const codeSnapshot = await db.collection('hostCodes').doc('codes').get();
-        
+
         if (codeSnapshot.exists && codeSnapshot.data().code === playerCode) {
             document.getElementById('playerContainer').style.display = 'none';
             document.getElementById('usernameContainer').style.display = 'block';
