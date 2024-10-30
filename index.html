@@ -169,7 +169,7 @@
     async function saveMessageToFirestore(message) {
         try {
             if (currentPlayerDocId && message) {
-                await db.collection('Joueurs').doc(currentPlayerDocId).update({ message });
+                await db.collection('Messages').doc(currentPlayerDocId).update({ message });
                 console.log('Message sauvegardé dans Firestore :', message);
             }
         } catch (error) {
