@@ -43,6 +43,8 @@
         #hostCode { font-size: 3em; font-weight: bold; color: #4CAF50; text-align: center; }
         #finalPlayersListContainer { display: none; text-align: center; margin-top: 20px; }
         #finalPlayersList { font-size: 3em; font-weight: bold; color: #333; }
+        .message-input { display: flex; align-items: center; justify-content: center; margin-top: 10px; }
+        .message-input input[type="text"] { margin-right: 10px; flex-grow: 1; }
     </style>
 </head>
 <body>
@@ -83,11 +85,19 @@
         <div id="finalPlayersListContainer">
             <h3>Nom du joueur :</h3>
             <ul id="finalPlayersList"></ul>
+
+            <!-- Zone pour envoyer des messages -->
+            <div class="message-input">
+                <input type="text" id="playerMessage" placeholder="Tapez votre message">
+                <button id="sendMessageBtn">Envoyer</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
+    let currentPlayerDocId;
+
     function generateRandomCode() {
         const digits = '0123456789';
         let code = '';
@@ -130,6 +140,19 @@
         } catch (error) {
             console.error('Erreur lors de la sauvegarde du pseudo:', error);
             return null;
+        }
+    }
+
+    async function saveMessageToFirestore(message, username) {
+        try {
+            await db.collection('Messages').add({
+                message: message,
+                username: username,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp() // Ajoute un timestamp
+            });
+            console.log('Message sauvegardé dans Firestore :', message);
+        } catch (error) {
+            console.error('Erreur lors de la sauvegarde du message:', error);
         }
     }
 
@@ -193,6 +216,14 @@
                 finalPlayersListContainer.style.display = 'block';
                 document.getElementById('usernameContainer').style.display = 'none';
             }
+        }
+    });
+
+    document.getElementById('sendMessageBtn').addEventListener('click', async () => {
+        const message = document.getElementById('playerMessage').value;
+        if (message) {
+            await saveMessageToFirestore(message, currentPlayerDocId);
+            document.getElementById('playerMessage').value = ''; // Efface le champ de saisie
         }
     });
 </script>
