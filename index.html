@@ -65,10 +65,6 @@
 
         <div id="codeContainer">
             <p>Code : <strong><span id="hostCode"></span></strong></p>
-            <div id="playersListContainer">
-                <h3>Joueurs connectés :</h3>
-                <ul id="playersList"></ul>
-            </div>
         </div>
 
         <div id="playerContainer">
@@ -135,7 +131,6 @@
             await clearMessagesCollection(); // Supprime les messages avant de sauvegarder le code
             await db.collection('hostCodes').doc('codes').set({ code });
             console.log('Code sauvegardé dans Firestore :', code);
-            await displayPlayersList(); // Affiche la liste des joueurs
         } catch (error) {
             console.error('Erreur lors de la sauvegarde du code:', error);
         }
@@ -149,7 +144,6 @@
             
             await db.collection('Joueurs').doc(playerDocId).set({ username });
             console.log('Pseudo sauvegardé dans Firestore :', username);
-            await displayPlayersList(); // Met à jour la liste des joueurs après avoir sauvegardé le pseudo
             return playerDocId;
         } catch (error) {
             console.error('Erreur lors de la sauvegarde du pseudo:', error);
@@ -157,75 +151,104 @@
         }
     }
 
-    async function displayPlayersList() {
-        const playersList = document.getElementById('playersList');
-        playersList.innerHTML = ''; // Vide la liste avant de la remplir
-        const playersSnapshot = await db.collection('Joueurs').get();
-        console.log(`Nombre de joueurs connectés : ${playersSnapshot.size}`); // Affiche le nombre de joueurs
-        playersSnapshot.forEach(doc => {
-            const li = document.createElement('li');
-            li.textContent = doc.data().username;
-            playersList.appendChild(li);
-            console.log(`Joueur ajouté : ${doc.data().username}`); // Affiche chaque joueur ajouté
-        });
+    async function saveMessageToFirestore(message, playerDocId) {
+        try {
+            const playerSnapshot = await db.collection('Joueurs').doc(playerDocId).get();
+            const username = playerSnapshot.data().username; // Récupère le nom d'utilisateur correspondant
+
+            await db.collection('Messages').add({
+                message: message,
+                username: username,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp() // Timestamp pour le tri
+            });
+            console.log('Message sauvegardé dans Firestore:', message);
+        } catch (error) {
+            console.error('Erreur lors de la sauvegarde du message:', error);
+        }
     }
 
     async function displayMessages() {
         const messagesList = document.getElementById('messagesList');
-        messagesList.innerHTML = ''; // Vide la liste avant de la remplir
-        const messagesSnapshot = await db.collection('Messages').orderBy('timestamp').get();
-        console.log(`Nombre de messages : ${messagesSnapshot.size}`); // Affiche le nombre de messages
+        messagesList.innerHTML = ''; // Vide la liste actuelle
+
+        const messagesSnapshot = await db.collection('Messages').orderBy('timestamp', 'desc').limit(6).get();
+
         messagesSnapshot.forEach(doc => {
             const li = document.createElement('li');
-            li.textContent = `${doc.data().username}: ${doc.data().message}`;
+            li.textContent = `${doc.data().username}: ${doc.data().message}`; // Affiche le message avec le nom d'utilisateur
             messagesList.appendChild(li);
-            console.log(`Message ajouté : ${doc.data().username}: ${doc.data().message}`); // Affiche chaque message ajouté
         });
+
+        // Ajouter un message vide si aucun message n'existe
+        if (messagesSnapshot.empty) {
+            messagesList.innerHTML = '<p>Aucun message</p>';
+        }
     }
 
-    // Initialisation des événements
     document.getElementById('hostBtn').addEventListener('click', async () => {
         const code = generateRandomCode();
         document.getElementById('hostCode').textContent = code;
+        document.getElementById('codeContainer').style.display = 'block';
         await saveCodeToFirestore(code);
-        document.getElementById('codeContainer').style.display = 'block'; // Affiche la zone de code
-        document.getElementById('chatContainer').style.display = 'block'; // Affiche le chat
     });
 
     document.getElementById('playerBtn').addEventListener('click', () => {
-        document.getElementById('playerContainer').style.display = 'block'; // Affiche la zone de joueur
-        document.getElementById('usernameContainer').style.display = 'block'; // Affiche la zone de pseudo
-        document.getElementById('codeContainer').style.display = 'none'; // Cache la zone de code
+        document.getElementById('playerContainer').style.display = 'block';
     });
 
     document.getElementById('confirmBtn').addEventListener('click', async () => {
         const playerCode = document.getElementById('playerCode').value;
-        // Ici, ajoutez la logique pour valider le code et lier le joueur à l'hébergeur
-        document.getElementById('errorMsg').textContent = 'Code confirmé !'; // Message de succès
+        const hostCodeSnapshot = await db.collection('hostCodes').doc('codes').get();
+
+        if (hostCodeSnapshot.exists && hostCodeSnapshot.data().code === playerCode) {
+            document.getElementById('usernameContainer').style.display = 'block';
+            document.getElementById('errorMsg').textContent = '';
+        } else {
+            document.getElementById('errorMsg').textContent = 'Code incorrect, veuillez réessayer.';
+        }
     });
 
     document.getElementById('submitUsernameBtn').addEventListener('click', async () => {
         const username = document.getElementById('username').value;
-        if (username) {
-            currentPlayerDocId = await saveUsernameToFirestore(username);
-            // Affichez le pseudo dans la liste finale des joueurs sur l'écran de l'hébergeur
-            await displayPlayersList(); // Mettez à jour la liste des joueurs
-            document.getElementById('finalPlayersListContainer').style.display = 'block'; // Affiche la liste des joueurs
-        } else {
-            console.error('Pseudo non valide');
+
+        if (username.trim() === '') {
+            alert('Veuillez entrer un pseudo valide.');
+            return;
+        }
+
+        currentPlayerDocId = await saveUsernameToFirestore(username);
+        if (currentPlayerDocId) {
+            document.getElementById('finalPlayersListContainer').style.display = 'block';
+            document.getElementById('playerContainer').style.display = 'none';
+            document.getElementById('usernameContainer').style.display = 'none';
+
+            // Afficher la liste des joueurs
+            const finalPlayersList = document.getElementById('finalPlayersList');
+            const li = document.createElement('li');
+            li.textContent = username; // Affiche le pseudo du joueur
+            finalPlayersList.appendChild(li);
+
+            // Affiche le chat
+            document.getElementById('chatContainer').style.display = 'block';
         }
     });
 
     document.getElementById('sendMessageBtn').addEventListener('click', async () => {
         const message = document.getElementById('playerMessage').value;
-        if (message && currentPlayerDocId) {
-            await saveMessageToFirestore(message, currentPlayerDocId);
-            document.getElementById('playerMessage').value = ''; // Vide le champ de message après envoi
-            await displayMessages(); // Affiche les messages dans le chat
-        } else {
-            console.error('Message vide ou utilisateur non connecté');
+
+        if (message.trim() === '') {
+            alert('Veuillez entrer un message valide.');
+            return;
         }
+
+        await saveMessageToFirestore(message, currentPlayerDocId);
+        document.getElementById('playerMessage').value = ''; // Réinitialise le champ du message
+
+        await displayMessages();
     });
+
+    // Récupère les messages toutes les secondes
+    setInterval(displayMessages, 1000);
 </script>
 
 </body>
