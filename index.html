@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interface Responsive - Hébergeur & Joueur</title>
 
-    <!-- Ajouter Firebase (SDK compatible) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
     <script>
         const firebaseConfig = {
-          apiKey: "AIzaSyDejZmhxJ-wjwJ3-nE2I43vMmhRqgqhcxA",
-          authDomain: "divagame-97e7c.firebaseapp.com",
-          projectId: "divagame-97e7c",
-          storageBucket: "divagame-97e7c.appspot.com",
-          messagingSenderId: "253959990116",
-          appId: "1:253959990116:web:506a1d0cdf752823656871"
+            apiKey: "VOTRE_API_KEY",
+            authDomain: "VOTRE_AUTH_DOMAIN",
+            projectId: "VOTRE_PROJECT_ID",
+            storageBucket: "VOTRE_STORAGE_BUCKET",
+            messagingSenderId: "VOTRE_MESSAGING_SENDER_ID",
+            appId: "VOTRE_APP_ID"
         };
 
         // Initialise Firebase
@@ -43,12 +43,6 @@
         #hostCode { font-size: 3em; font-weight: bold; color: #4CAF50; text-align: center; }
         #finalPlayersListContainer { display: none; text-align: center; margin-top: 20px; }
         #finalPlayersList { font-size: 3em; font-weight: bold; color: #333; }
-
-        /* Styles pour le chat */
-        #chatContainer { display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        #chatInputContainer { display: flex; align-items: center; gap: 10px; justify-content: center; margin-top: 10px; }
-        #chatMessage { padding: 10px; font-size: 1em; border: 1px solid #ccc; border-radius: 5px; resize: none; width: 200px; height: 40px; }
-        #sendChatBtn { padding: 10px; font-size: 1em; cursor: pointer; background-color: #4CAF50; color: white; border: none; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -89,12 +83,6 @@
         <div id="finalPlayersListContainer">
             <h3>Nom du joueur :</h3>
             <ul id="finalPlayersList"></ul>
-
-            <!-- Zone de chat sous le nom du joueur, centrée avec le pseudo -->
-            <div id="chatInputContainer">
-                <textarea id="chatMessage" placeholder="Tapez votre message..."></textarea>
-                <button id="sendChatBtn">Envoyer</button>
-            </div>
         </div>
     </div>
 </div>
@@ -158,20 +146,23 @@
 
     db.collection('Joueurs').onSnapshot(displayPlayersList);
 
-    let currentPlayerDocId = null;
-
     document.getElementById('hostBtn').addEventListener('click', async () => {
         const code = generateRandomCode();
         document.getElementById('hostCode').textContent = code;
         document.getElementById('codeContainer').style.display = 'block';
         await saveCodeToFirestore(code);
         document.querySelector('.button-container').style.display = 'none';
+        
+        // Afficher le conteneur de chat pour l'hôte uniquement
         document.getElementById('chatContainer').style.display = 'block';
     });
 
     document.getElementById('playerBtn').addEventListener('click', () => {
         document.getElementById('playerContainer').style.display = 'block';
         document.querySelector('.button-container').style.display = 'none';
+
+        // S'assurer que le conteneur de chat reste caché pour le joueur
+        document.getElementById('chatContainer').style.display = 'none';
     });
 
     document.getElementById('confirmBtn').addEventListener('click', async () => {
@@ -201,20 +192,6 @@
                 finalPlayersList.appendChild(li);
                 finalPlayersListContainer.style.display = 'block';
                 document.getElementById('usernameContainer').style.display = 'none';
-                document.getElementById('chatInputContainer').style.display = 'flex';
-            }
-        }
-    });
-
-    document.getElementById('sendChatBtn').addEventListener('click', async () => {
-        const chatMessage = document.getElementById('chatMessage').value;
-        if (chatMessage && currentPlayerDocId) {
-            try {
-                await db.collection('Joueurs').doc(currentPlayerDocId).update({ message: chatMessage });
-                console.log('Message sauvegardé :', chatMessage);
-                document.getElementById('chatMessage').value = ''; // Effacer le message après envoi
-            } catch (error) {
-                console.error('Erreur lors de la sauvegarde du message:', error);
             }
         }
     });
