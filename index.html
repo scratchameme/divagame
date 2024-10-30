@@ -174,15 +174,13 @@
 
     async function displayPlayersList() {
         const playersList = document.getElementById('playersList');
-        playersList.innerHTML = ''; // Vide la liste actuelle
-
+        playersList.innerHTML = '';
         const playersSnapshot = await db.collection('Joueurs').get();
         playersSnapshot.forEach(doc => {
             const li = document.createElement('li');
-            li.textContent = doc.data().username; // Affiche le pseudo du joueur
+            li.textContent = doc.data().username;
             playersList.appendChild(li);
         });
-
         // Si la liste des joueurs est vide, ajouter un message
         if (playersList.children.length === 0) {
             const emptyMessage = document.createElement('li');
