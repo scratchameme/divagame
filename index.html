@@ -78,8 +78,7 @@
             margin-bottom: 20px;
         }
         #comingSoonBtn {
-            background-color: gray; /* Changez le fond du bouton en gris */
-            color: white; /* Couleur du texte en blanc */
+            color: gray;
         }
     </style>
 </head>
@@ -142,7 +141,7 @@
     <button id="comingSoonBtn" disabled>???<br><small>Bientôt disponible...</small></button>
 </div>
 <!-- Bouton Commencer -->
-<button id="startBtn">Commencer</button>
+<button id="startBtn" style="display: none;">Commencer</button>
 
 <script>
     let currentPlayerDocId;
@@ -182,7 +181,7 @@
         try {
             const playersSnapshot = await db.collection('Joueurs').get();
             const playerCount = playersSnapshot.size + 1;
-            const playerDocId = `Player${playerCount}`;
+            const playerDocId = Player${playerCount};
     
             // Récupère la couleur choisie par le joueur
             const color = document.getElementById('colorPicker').value;
@@ -232,7 +231,7 @@
             snapshot.forEach(doc => {
                 const messageData = doc.data();
                 const messageElement = document.createElement('p');
-                messageElement.innerHTML = `<strong style="color: ${messageData.color || '#000000'};">${messageData.username}:</strong> ${messageData.message}`;
+                messageElement.innerHTML = <strong style="color: ${messageData.color || '#000000'};">${messageData.username}:</strong> ${messageData.message};
                 chatContainer.appendChild(messageElement);
             });
         });
@@ -283,19 +282,15 @@
         document.getElementById('codeContainer').style.display = 'block';
         await saveCodeToFirestore(code);
         document.querySelector('.button-container').style.display = 'none';
-        
+    
         await clearMessagesCollection();
-        
+    
         document.getElementById('chatContainer').style.display = 'block';
         displayMessages();  // Appel de la fonction pour afficher les messages
-    
-        // Vérifiez le nombre de joueurs et affichez le bouton "Commencer" si au moins un joueur est présent
-        const playersSnapshot = await db.collection('Joueurs').get();
-        if (playersSnapshot.size > 0) {
-            document.getElementById('startBtn').style.display = 'block';
-        }
+        
+        // Afficher le bouton "Commencer"
+        document.getElementById('startBtn').style.display = 'block';
     });
-
 
     document.getElementById('playerBtn').addEventListener('click', () => {
         document.getElementById('playerContainer').style.display = 'block';
