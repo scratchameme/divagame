@@ -50,7 +50,7 @@
 <body>
 
 <div class="container">
-    <div class="chat-container" id="chatContainer" style="display: none;"> <!-- Caché par défaut -->
+    <div class="chat-container" id="chatContainer">
         <h3>Chat</h3>
         <ul id="messagesList">
             <p>Aucun message</p>
@@ -109,16 +109,6 @@
         return code;
     }
 
-    async function clearMessagesCollection() {
-        const messagesSnapshot = await db.collection('Messages').get();
-        const batch = db.batch();
-        messagesSnapshot.forEach(doc => {
-            batch.delete(doc.ref);
-        });
-        await batch.commit();
-        console.log('Tous les documents de la collection "Messages" ont été supprimés.');
-    }
-
     async function clearPlayersCollection() {
         const playersSnapshot = await db.collection('Joueurs').get();
         const batch = db.batch();
@@ -131,11 +121,10 @@
 
     async function saveCodeToFirestore(code) {
         try {
-            await clearPlayersCollection(); // Supprime les joueurs avant de sauvegarder le code
-            await clearMessagesCollection(); // Supprime les messages avant de sauvegarder le code
+            await clearPlayersCollection();
             await db.collection('hostCodes').doc('codes').set({ code });
             console.log('Code sauvegardé dans Firestore :', code);
-            displayPlayersList(); // Affiche la liste des joueurs
+            displayPlayersList();
         } catch (error) {
             console.error('Erreur lors de la sauvegarde du code:', error);
         }
@@ -145,11 +134,10 @@
         try {
             const playersSnapshot = await db.collection('Joueurs').get();
             const playerCount = playersSnapshot.size + 1;
-            const playerDocId = Player${playerCount};
+            const playerDocId = `Player${playerCount}`;
             
             await db.collection('Joueurs').doc(playerDocId).set({ username });
             console.log('Pseudo sauvegardé dans Firestore :', username);
-            await displayPlayersList(); // Met à jour la liste des joueurs après avoir sauvegardé le pseudo
             return playerDocId;
         } catch (error) {
             console.error('Erreur lors de la sauvegarde du pseudo:', error);
@@ -157,56 +145,39 @@
         }
     }
 
-    async function saveMessageToFirestore(message, playerDocId) {
+    async function saveMessageToFirestore(message, username) {
         try {
-            const playerSnapshot = await db.collection('Joueurs').doc(playerDocId).get();
-            const username = playerSnapshot.data().username; // Récupère le nom d'utilisateur correspondant
-
             await db.collection('Messages').add({
                 message: message,
                 username: username,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp() // Timestamp pour le tri
+                timestamp: firebase.firestore.FieldValue.serverTimestamp() // Ajoute un timestamp
             });
-            console.log('Message sauvegardé dans Firestore:', message);
+            console.log('Message sauvegardé dans Firestore :', message);
         } catch (error) {
             console.error('Erreur lors de la sauvegarde du message:', error);
         }
     }
 
-    async function displayPlayersList() {
-        const playersList = document.getElementById('playersList');
-        playersList.innerHTML = ''; // Vide la liste actuelle
-
-        const playersSnapshot = await db.collection('Joueurs').get();
-        playersSnapshot.forEach(doc => {
-            const li = document.createElement('li');
-            li.textContent = doc.data().username; // Affiche le pseudo du joueur
-            playersList.appendChild(li);
-        });
-
-        // Si la liste des joueurs est vide, ajouter un message
-        if (playersList.children.length === 0) {
-            const emptyMessage = document.createElement('li');
-            emptyMessage.textContent = 'Aucun joueur connecté';
-            playersList.appendChild(emptyMessage);
-        }
-    }
-
     async function displayMessages() {
         const messagesList = document.getElementById('messagesList');
-        messagesList.innerHTML = ''; // Vide la liste actuelle
+        messagesList.innerHTML = '';
 
         const messagesSnapshot = await db.collection('Messages').orderBy('timestamp', 'desc').limit(6).get();
 
         messagesSnapshot.forEach(doc => {
             const li = document.createElement('li');
-            li.textContent = ${doc.data().username}: ${doc.data().message}; // Affiche le message avec le nom d'utilisateur
-            messagesList.appendChild(li);
+            li.textContent = `${doc.data().username}: ${doc.data().message}`;
+            messagesList.prepend(li); // Ajoute chaque message en haut de la liste
         });
 
-        // Ajouter un message vide si aucun message n'existe
-        if (messagesList.children.length === 0) {
-            const emptyMessage = document.createElement('li');
+        // Si la liste contient plus de 6 messages, supprimer le plus ancien
+        if (messagesList.childElementCount > 6) {
+            messagesList.removeChild(messagesList.lastElementChild);
+        }
+
+        // Afficher un message si la liste est vide
+        if (messagesList.childElementCount === 0) {
+            const emptyMessage = document.createElement('p');
             emptyMessage.textContent = 'Aucun message';
             messagesList.appendChild(emptyMessage);
         }
@@ -224,7 +195,7 @@
 
         document.getElementById('codeContainer').style.display = 'block';
         document.querySelector('.button-container').style.display = 'none';
-
+        
         // Afficher le conteneur de chat pour l'hôte uniquement
         document.getElementById('chatContainer').style.display = 'block';
     });
