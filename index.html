@@ -69,6 +69,12 @@
 </head>
 <body>
 
+<!-- Boutons de sélection (affichés après le clic sur "Commencer" par l'hébergeur) -->
+<div id="selectionContainer" style="display: none; text-align: center; padding: 20px;">
+    <button id="miniGamesBtn" style="width: 80%; padding: 20px; font-size: 2em; margin-bottom: 20px;">Mini-jeux</button>
+    <button id="comingSoonBtn" style="width: 80%; padding: 20px; font-size: 2em; color: gray;" disabled>???<br><small>Bientôt disponible...</small></button>
+</div>
+
 <div class="container">
     <div class="chat-container" id="chatContainer">
         <h3>Chat</h3>
@@ -268,7 +274,13 @@
     
         document.getElementById('chatContainer').style.display = 'block';
         displayMessages();  // Appel de la fonction pour afficher les messages
-        document.getElementById('startBtn').style.display = 'block';
+        // Gestion du bouton "Commencer"
+    document.getElementById('startBtn').addEventListener('click', () => {
+        document.querySelector('.container').style.display = 'none';
+        document.getElementById('startBtn').style.display = 'none';
+        document.getElementById('selectionContainer').style.display = 'block'; // Affiche les boutons Mini-jeux et ???
+    });
+
     });
 
 
