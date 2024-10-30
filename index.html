@@ -29,7 +29,23 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: Arial, sans-serif; background-color: #f0f0f5; }
         .container { display: flex; width: 100%; max-width: 800px; padding: 20px; background-color: #ffffff; box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); border-radius: 10px; }
-        .chat-container { display: none; width: 200px; height: 350px; margin-right: 20px; border: 1px solid #ccc; border-radius: 5px; padding: 10px; overflow-y: auto; background-color: #f0f0f5; }
+        .chat-container {
+    display: block;
+    width: 100%;
+    height: 350px;
+    margin-right: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    overflow: hidden; /* Empêche la barre de défilement */
+    background-color: #f0f0f5;
+    display: flex;
+    flex-direction: column-reverse; /* Affiche les messages de bas en haut */
+}
+.chat-container p {
+    word-wrap: break-word; /* Coupe les mots longs pour éviter le débordement */
+    margin: 0; /* Pas de marge pour les paragraphes de message */
+}
         .main-container { flex-grow: 1; }
         h3 { margin-top: 20px; font-size: 1.5em; color: #333; }
         button { padding: 10px 20px; font-size: 1.2em; cursor: pointer; background-color: #4CAF50; color: #fff; border: none; border-radius: 5px; transition: background-color 0.3s ease; }
@@ -146,17 +162,35 @@
         console.log('Tous les documents de la collection "Joueurs" ont été supprimés.');
     }
 
-    async function saveCodeToFirestore(code) {
+    async function saveMessageToFirestore(message) {
         try {
-            await clearPlayersCollection();
-            await clearMessagesCollection(); // Supprime tous les messages existants
-            await db.collection('hostCodes').doc('codes').set({ code });
-            console.log('Code sauvegardé dans Firestore :', code);
-            displayPlayersList();
+            if (currentPlayerUsername && message) {
+                // Récupère la couleur du joueur à partir de la collection "Joueurs"
+                const playerDoc = await db.collection('Joueurs').doc(currentPlayerDocId).get();
+                const color = playerDoc.exists ? playerDoc.data().color : '#000000';
+    
+                await db.collection('Messages').add({
+                    username: currentPlayerUsername,
+                    message: message,
+                    color: color,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                console.log('Message sauvegardé dans Firestore :', message);
+                await enforceMessageLimit();  // Vérifie la limite des messages
+            }
         } catch (error) {
-            console.error('Erreur lors de la sauvegarde du code:', error);
+            console.error('Erreur lors de la sauvegarde du message:', error);
         }
     }
+
+    async function enforceMessageLimit() {
+    const messagesSnapshot = await db.collection('Messages').orderBy('timestamp').get();
+    if (messagesSnapshot.size > 13) {
+        const oldestMessageDoc = messagesSnapshot.docs[0];  // Sélectionne le plus ancien
+        await db.collection('Messages').doc(oldestMessageDoc.id).delete();
+        console.log('Message le plus ancien supprimé pour respecter la limite.');
+    }
+}
 
     async function saveUsernameToFirestore(username) {
         try {
@@ -189,6 +223,7 @@
                     username: currentPlayerUsername,
                     message: message,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()  // Ajoute un timestamp
+                await enforceMessageLimit(); // Vérifie la limite des messages
                 });
                 console.log('Message sauvegardé dans Firestore :', message);
             }
@@ -203,13 +238,19 @@
         
         db.collection('Messages').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
             chatContainer.innerHTML = '<h3>Chat</h3>';  // Réinitialise l'affichage des messages
+            let messageCount = 0;
             snapshot.forEach(doc => {
                 const messageData = doc.data();
                 const messageElement = document.createElement('p');
-    
-                // Applique la couleur de l'utilisateur si elle est disponible
-                messageElement.innerHTML = `<strong style="color: ${messageData.color || '#000000'};">${messageData.username}:</strong> ${messageData.message}`;
+                messageElement.style.color = messageData.color || '#000000'; // Applique la couleur du joueur
+                messageElement.innerHTML = `<strong>${messageData.username}:</strong> ${messageData.message}`;
                 chatContainer.appendChild(messageElement);
+                messageCount++;
+                
+                // Supprime les messages en excès (au-delà de 13) du conteneur
+                if (messageCount > 13) {
+                    chatContainer.removeChild(chatContainer.lastChild);
+                }
             });
         });
     }
