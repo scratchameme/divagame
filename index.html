@@ -130,43 +130,26 @@
     }
 
     async function saveCodeToFirestore(code) {
-        try {
-            await clearPlayersCollection();
-            await db.collection('hostCodes').doc('codes').set({ code });
-            console.log('Code sauvegardé dans Firestore :', code);
-            displayPlayersList();
-        } catch (error) {
-            console.error('Erreur lors de la sauvegarde du code:', error);
-        }
+        await db.collection('hostCodes').doc('codes').set({ code });
+        console.log('Code sauvegardé dans Firestore :', code);
+        displayPlayersList();
     }
 
     async function saveUsernameToFirestore(username) {
-        try {
-            const playersSnapshot = await db.collection('Joueurs').get();
-            const playerCount = playersSnapshot.size + 1;
-            const playerDocId = `Player${playerCount}`;
-            
-            await db.collection('Joueurs').doc(playerDocId).set({ username });
-            console.log('Pseudo sauvegardé dans Firestore :', username);
-            return playerDocId;
-        } catch (error) {
-            console.error('Erreur lors de la sauvegarde du pseudo:', error);
-            return null;
-        }
+        const playerDocId = `Player${new Date().getTime()}`;
+        await db.collection('Joueurs').doc(playerDocId).set({ username });
+        console.log('Pseudo sauvegardé dans Firestore :', username);
+        return playerDocId;
     }
 
     async function saveMessageToFirestore(message) {
-        try {
-            if (currentPlayerDocId && message) {
-                await db.collection('Messages').add({
-                    playerId: currentPlayerDocId,
-                    message: message,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                console.log('Message sauvegardé dans Firestore :', message);
-            }
-        } catch (error) {
-            console.error('Erreur lors de la sauvegarde du message:', error);
+        if (currentPlayerDocId && message) {
+            await db.collection('Messages').add({
+                playerId: currentPlayerDocId,
+                message: message,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            console.log('Message sauvegardé dans Firestore :', message);
         }
     }
 
@@ -195,7 +178,7 @@
     document.getElementById('hostBtn').addEventListener('click', async () => {
         const code = generateRandomCode();
         document.getElementById('hostCode').textContent = code;
-        await clearMessagesCollection(); // Effacer les messages avant de commencer un nouveau chat
+        await clearMessagesCollection(); // Effacer tous les messages
         await saveCodeToFirestore(code);
         document.getElementById('codeContainer').style.display = 'block';
         document.getElementById('chatContainer').style.display = 'block';
