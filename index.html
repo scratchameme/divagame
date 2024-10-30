@@ -25,10 +25,11 @@
     </script>
 
     <style>
+        /* Styles principaux */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: Arial, sans-serif; background-color: #f0f0f5; }
         .container { display: flex; width: 100%; max-width: 800px; padding: 20px; background-color: #ffffff; box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); border-radius: 10px; }
-        .chat-container { display: flex; flex-direction: column; width: 200px; height: 350px; margin-right: 20px; border: 1px solid #ccc; border-radius: 5px; padding: 10px; overflow-y: auto; background-color: #f0f0f5; }
+        .chat-container { display: none; width: 200px; height: 350px; margin-right: 20px; border: 1px solid #ccc; border-radius: 5px; padding: 10px; overflow-y: auto; background-color: #f0f0f5; }
         .main-container { flex-grow: 1; }
         h3 { margin-top: 20px; font-size: 1.5em; color: #333; }
         button { padding: 10px 20px; font-size: 1.2em; cursor: pointer; background-color: #4CAF50; color: #fff; border: none; border-radius: 5px; transition: background-color 0.3s ease; }
@@ -37,7 +38,7 @@
         #codeContainer, #playerContainer, #usernameContainer { display: none; font-size: 1.5em; margin-top: 20px; width: 100%; }
         #errorMsg { color: red; font-size: 1.1em; margin-top: 10px; }
         label { font-size: 1.2em; color: #333; margin-bottom: 8px; }
-        input[type="text"] { width: 100%; max-width: 300px; padding: 10px; font-size: 1.1em; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 15px; }
+        input[type="text"], textarea { width: 100%; max-width: 300px; padding: 10px; font-size: 1.1em; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 15px; }
         ul { list-style-type: none; padding: 0; margin: 10px 0; width: 100%; text-align: center; }
         ul li { font-size: 1.5em; color: #333; padding: 5px 0; border-bottom: 1px solid #eee; }
         #hostCode { font-size: 3em; font-weight: bold; color: #4CAF50; text-align: center; }
@@ -52,9 +53,7 @@
 <div class="container">
     <div class="chat-container" id="chatContainer">
         <h3>Chat</h3>
-        <ul id="messagesList">
-            <p>Aucun message</p>
-        </ul>
+        <p>Le chat apparaîtra ici.</p>
     </div>
 
     <div class="main-container">
@@ -88,7 +87,7 @@
             <h3>Nom du joueur :</h3>
             <ul id="finalPlayersList"></ul>
 
-            <!-- Zone pour envoyer des messages -->
+            <!-- Zone de message et bouton envoyer -->
             <div class="message-input">
                 <input type="text" id="playerMessage" placeholder="Tapez votre message">
                 <button id="sendMessageBtn">Envoyer</button>
@@ -109,16 +108,6 @@
         return code;
     }
 
-    async function clearMessagesCollection() {
-        const messagesSnapshot = await db.collection('Messages').get();
-        const batch = db.batch();
-        messagesSnapshot.forEach(doc => {
-            batch.delete(doc.ref);
-        });
-        await batch.commit();
-        console.log('Tous les documents de la collection "Messages" ont été supprimés.');
-    }
-
     async function clearPlayersCollection() {
         const playersSnapshot = await db.collection('Joueurs').get();
         const batch = db.batch();
@@ -131,11 +120,10 @@
 
     async function saveCodeToFirestore(code) {
         try {
-            await clearPlayersCollection(); // Supprime les joueurs avant de sauvegarder le code
-            await clearMessagesCollection(); // Supprime les messages avant de sauvegarder le code
+            await clearPlayersCollection();
             await db.collection('hostCodes').doc('codes').set({ code });
             console.log('Code sauvegardé dans Firestore :', code);
-            displayPlayersList(); // Assurez-vous que cette fonction existe
+            displayPlayersList();
         } catch (error) {
             console.error('Erreur lors de la sauvegarde du code:', error);
         }
@@ -156,17 +144,12 @@
         }
     }
 
-    async function saveMessageToFirestore(message, playerDocId) {
+    async function saveMessageToFirestore(message) {
         try {
-            const playerSnapshot = await db.collection('Joueurs').doc(playerDocId).get();
-            const username = playerSnapshot.data().username; // Récupère le nom d'utilisateur correspondant
-
-            await db.collection('Messages').add({
-                message: message,
-                username: username,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp() // Timestamp pour le tri
-            });
-            console.log('Message sauvegardé dans Firestore:', message);
+            if (currentPlayerDocId && message) {
+                await db.collection('Joueurs').doc(currentPlayerDocId).update({ message });
+                console.log('Message sauvegardé dans Firestore :', message);
+            }
         } catch (error) {
             console.error('Erreur lors de la sauvegarde du message:', error);
         }
@@ -174,76 +157,39 @@
 
     async function displayPlayersList() {
         const playersList = document.getElementById('playersList');
-        playersList.innerHTML = ''; // Vide la liste actuelle
-
+        playersList.innerHTML = '';
         const playersSnapshot = await db.collection('Joueurs').get();
         playersSnapshot.forEach(doc => {
             const li = document.createElement('li');
-            li.textContent = doc.data().username; // Affiche le pseudo du joueur
+            li.textContent = doc.data().username;
             playersList.appendChild(li);
         });
-
-        // Si la liste des joueurs est vide, ajouter un message
-        if (playersList.children.length === 0) {
-            const emptyMessage = document.createElement('li');
-            emptyMessage.textContent = 'Aucun joueur connecté';
-            playersList.appendChild(emptyMessage);
-        }
     }
 
-    async function displayMessages() {
-        const messagesList = document.getElementById('messagesList');
-        messagesList.innerHTML = ''; // Vide la liste actuelle
-
-        const messagesSnapshot = await db.collection('Messages').orderBy('timestamp', 'desc').limit(6).get();
-
-        messagesSnapshot.forEach(doc => {
-            const li = document.createElement('li');
-            li.textContent = `${doc.data().username}: ${doc.data().message}`; // Affiche le message avec le nom d'utilisateur
-            messagesList.appendChild(li);
-        });
-
-        // Ajouter un message vide si aucun message n'existe
-        if (messagesList.children.length === 0) {
-            const emptyMessage = document.createElement('li');
-            emptyMessage.textContent = 'Aucun message';
-            messagesList.appendChild(emptyMessage);
-        }
-    }
-
-    // Écouteur d'événements pour les messages
-    db.collection('Messages').orderBy('timestamp').onSnapshot((snapshot) => {
-        displayMessages();
-    });
+    db.collection('Joueurs').onSnapshot(displayPlayersList);
 
     document.getElementById('hostBtn').addEventListener('click', async () => {
         const code = generateRandomCode();
         document.getElementById('hostCode').textContent = code;
-        await saveCodeToFirestore(code);
-
         document.getElementById('codeContainer').style.display = 'block';
+        await saveCodeToFirestore(code);
         document.querySelector('.button-container').style.display = 'none';
-
-        // Afficher le conteneur de chat pour l'hôte uniquement
+        
         document.getElementById('chatContainer').style.display = 'block';
     });
 
     document.getElementById('playerBtn').addEventListener('click', () => {
         document.getElementById('playerContainer').style.display = 'block';
         document.querySelector('.button-container').style.display = 'none';
-
-        // S'assurer que le conteneur de chat reste caché pour le joueur
-        document.getElementById('chatContainer').style.display = 'none';
     });
 
     document.getElementById('confirmBtn').addEventListener('click', async () => {
         const playerCode = document.getElementById('playerCode').value;
         const codeSnapshot = await db.collection('hostCodes').doc('codes').get();
-        const savedCode = codeSnapshot.data().code;
-
-        if (playerCode === savedCode) {
-            document.getElementById('usernameContainer').style.display = 'block';
+        
+        if (codeSnapshot.exists && codeSnapshot.data().code === playerCode) {
             document.getElementById('playerContainer').style.display = 'none';
+            document.getElementById('usernameContainer').style.display = 'block';
             document.getElementById('errorMsg').textContent = '';
         } else {
             document.getElementById('errorMsg').textContent = 'Code incorrect, veuillez réessayer.';
@@ -263,18 +209,15 @@
                 finalPlayersList.appendChild(li);
                 finalPlayersListContainer.style.display = 'block';
                 document.getElementById('usernameContainer').style.display = 'none';
-
-                // Appel de displayPlayersList pour mettre à jour la liste des joueurs
-                await displayPlayersList();
             }
         }
     });
 
-    document.getElementById('sendMessageBtn').addEventListener('click', async () => {
+    document.getElementById('sendMessageBtn').addEventListener('click', () => {
         const message = document.getElementById('playerMessage').value;
         if (message) {
-            await saveMessageToFirestore(message, currentPlayerDocId);
-            document.getElementById('playerMessage').value = ''; // Efface le champ de saisie
+            saveMessageToFirestore(message);
+            document.getElementById('playerMessage').value = '';
         }
     });
 </script>
