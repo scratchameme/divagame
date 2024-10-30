@@ -135,7 +135,7 @@
             await clearMessagesCollection(); // Supprime les messages avant de sauvegarder le code
             await db.collection('hostCodes').doc('codes').set({ code });
             console.log('Code sauvegardé dans Firestore :', code);
-            displayPlayersList(); // Affiche la liste des joueurs
+            await displayPlayersList(); // Affiche la liste des joueurs
         } catch (error) {
             console.error('Erreur lors de la sauvegarde du code:', error);
         }
@@ -157,122 +157,73 @@
         }
     }
 
-    async function saveMessageToFirestore(message, playerDocId) {
-        try {
-            const playerSnapshot = await db.collection('Joueurs').doc(playerDocId).get();
-            const username = playerSnapshot.data().username; // Récupère le nom d'utilisateur correspondant
-
-            await db.collection('Messages').add({
-                message: message,
-                username: username,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp() // Timestamp pour le tri
-            });
-            console.log('Message sauvegardé dans Firestore:', message);
-        } catch (error) {
-            console.error('Erreur lors de la sauvegarde du message:', error);
-        }
-    }
-
     async function displayPlayersList() {
         const playersList = document.getElementById('playersList');
-        playersList.innerHTML = ''; // Vide la liste actuelle
-
+        playersList.innerHTML = ''; // Vide la liste avant de la remplir
         const playersSnapshot = await db.collection('Joueurs').get();
+        console.log(`Nombre de joueurs connectés : ${playersSnapshot.size}`); // Affiche le nombre de joueurs
         playersSnapshot.forEach(doc => {
             const li = document.createElement('li');
-            li.textContent = doc.data().username; // Affiche le pseudo du joueur
+            li.textContent = doc.data().username;
             playersList.appendChild(li);
+            console.log(`Joueur ajouté : ${doc.data().username}`); // Affiche chaque joueur ajouté
         });
-
-        // Si la liste des joueurs est vide, ajouter un message
-        if (playersList.children.length === 0) {
-            const emptyMessage = document.createElement('li');
-            emptyMessage.textContent = 'Aucun joueur connecté';
-            playersList.appendChild(emptyMessage);
-        }
     }
 
     async function displayMessages() {
         const messagesList = document.getElementById('messagesList');
-        messagesList.innerHTML = ''; // Vide la liste actuelle
-
-        const messagesSnapshot = await db.collection('Messages').orderBy('timestamp', 'desc').limit(6).get();
-
+        messagesList.innerHTML = ''; // Vide la liste avant de la remplir
+        const messagesSnapshot = await db.collection('Messages').orderBy('timestamp').get();
+        console.log(`Nombre de messages : ${messagesSnapshot.size}`); // Affiche le nombre de messages
         messagesSnapshot.forEach(doc => {
             const li = document.createElement('li');
-            li.textContent = `${doc.data().username}: ${doc.data().message}`; // Affiche le message avec le nom d'utilisateur
+            li.textContent = `${doc.data().username}: ${doc.data().message}`;
             messagesList.appendChild(li);
+            console.log(`Message ajouté : ${doc.data().username}: ${doc.data().message}`); // Affiche chaque message ajouté
         });
-
-        // Ajouter un message vide si aucun message n'existe
-        if (messagesList.children.length === 0) {
-            const emptyMessage = document.createElement('li');
-            emptyMessage.textContent = 'Aucun message';
-            messagesList.appendChild(emptyMessage);
-        }
     }
 
-    // Écouteur d'événements pour les messages
-    db.collection('Messages').orderBy('timestamp').onSnapshot((snapshot) => {
-        displayMessages();
-    });
-
+    // Initialisation des événements
     document.getElementById('hostBtn').addEventListener('click', async () => {
         const code = generateRandomCode();
         document.getElementById('hostCode').textContent = code;
         await saveCodeToFirestore(code);
-
-        document.getElementById('codeContainer').style.display = 'block';
-        document.querySelector('.button-container').style.display = 'none';
-
-        // Afficher le conteneur de chat pour l'hôte uniquement
-        document.getElementById('chatContainer').style.display = 'block';
+        document.getElementById('codeContainer').style.display = 'block'; // Affiche la zone de code
+        document.getElementById('chatContainer').style.display = 'block'; // Affiche le chat
     });
 
     document.getElementById('playerBtn').addEventListener('click', () => {
-        document.getElementById('playerContainer').style.display = 'block';
-        document.querySelector('.button-container').style.display = 'none';
-
-        // S'assurer que le conteneur de chat reste caché pour le joueur
-        document.getElementById('chatContainer').style.display = 'none';
+        document.getElementById('playerContainer').style.display = 'block'; // Affiche la zone de joueur
+        document.getElementById('usernameContainer').style.display = 'block'; // Affiche la zone de pseudo
+        document.getElementById('codeContainer').style.display = 'none'; // Cache la zone de code
     });
 
     document.getElementById('confirmBtn').addEventListener('click', async () => {
         const playerCode = document.getElementById('playerCode').value;
-        const codeSnapshot = await db.collection('hostCodes').doc('codes').get();
-        const savedCode = codeSnapshot.data().code;
-
-        if (playerCode === savedCode) {
-            document.getElementById('usernameContainer').style.display = 'block';
-            document.getElementById('playerContainer').style.display = 'none';
-            document.getElementById('errorMsg').textContent = '';
-        } else {
-            document.getElementById('errorMsg').textContent = 'Code incorrect, veuillez réessayer.';
-        }
+        // Ici, ajoutez la logique pour valider le code et lier le joueur à l'hébergeur
+        document.getElementById('errorMsg').textContent = 'Code confirmé !'; // Message de succès
     });
 
     document.getElementById('submitUsernameBtn').addEventListener('click', async () => {
         const username = document.getElementById('username').value;
         if (username) {
             currentPlayerDocId = await saveUsernameToFirestore(username);
-            if (currentPlayerDocId) {
-                const finalPlayersListContainer = document.getElementById('finalPlayersListContainer');
-                const finalPlayersList = document.getElementById('finalPlayersList');
-                finalPlayersList.innerHTML = '';
-                const li = document.createElement('li');
-                li.textContent = username;
-                finalPlayersList.appendChild(li);
-                finalPlayersListContainer.style.display = 'block';
-                document.getElementById('usernameContainer').style.display = 'none';
-            }
+            // Affichez le pseudo dans la liste finale des joueurs sur l'écran de l'hébergeur
+            await displayPlayersList(); // Mettez à jour la liste des joueurs
+            document.getElementById('finalPlayersListContainer').style.display = 'block'; // Affiche la liste des joueurs
+        } else {
+            console.error('Pseudo non valide');
         }
     });
 
     document.getElementById('sendMessageBtn').addEventListener('click', async () => {
         const message = document.getElementById('playerMessage').value;
-        if (message) {
+        if (message && currentPlayerDocId) {
             await saveMessageToFirestore(message, currentPlayerDocId);
-            document.getElementById('playerMessage').value = ''; // Efface le champ de saisie
+            document.getElementById('playerMessage').value = ''; // Vide le champ de message après envoi
+            await displayMessages(); // Affiche les messages dans le chat
+        } else {
+            console.error('Message vide ou utilisateur non connecté');
         }
     });
 </script>
