@@ -169,17 +169,19 @@
     }
 
     async function saveMessageToFirestore(message) {
-            if (currentPlayerUsername && message) {
-                // Crée un document pour chaque message dans la collection "Messages"
-                await db.collection('Messages').add({
-                    username: currentPlayerUsername,
-                    message: message
-                });
-                console.log('Message sauvegardé dans Firestore :', message);
-        catch (error) {
-            console.error('Erreur lors de la sauvegarde du message:', error);
+    try {
+        if (currentPlayerUsername && message) {
+            // Crée un document pour chaque message dans la collection "Messages"
+            await db.collection('Messages').add({
+                username: currentPlayerUsername,
+                message: message
+            });
+            console.log('Message sauvegardé dans Firestore :', message);
         }
+    } catch (error) {
+        console.error('Erreur lors de la sauvegarde du message:', error);
     }
+}
 
     async function displayPlayersList() {
         const playersList = document.getElementById('playersList');
