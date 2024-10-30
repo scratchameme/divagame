@@ -149,6 +149,7 @@
             
             await db.collection('Joueurs').doc(playerDocId).set({ username });
             console.log('Pseudo sauvegardé dans Firestore :', username);
+            await displayPlayersList(); // Met à jour la liste des joueurs après avoir sauvegardé le pseudo
             return playerDocId;
         } catch (error) {
             console.error('Erreur lors de la sauvegarde du pseudo:', error);
@@ -263,9 +264,6 @@
                 finalPlayersList.appendChild(li);
                 finalPlayersListContainer.style.display = 'block';
                 document.getElementById('usernameContainer').style.display = 'none';
-
-                // Appel de displayPlayersList pour mettre à jour la liste des joueurs sur l'écran de l'hébergeur
-                await displayPlayersList();
             }
         }
     });
