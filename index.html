@@ -188,6 +188,17 @@
         });
     }
 
+    async function clearMessagesCollection() {
+    const messagesSnapshot = await db.collection('Messages').get();
+    const batch = db.batch();
+    messagesSnapshot.forEach(doc => {
+        batch.delete(doc.ref);
+    });
+    await batch.commit();
+    console.log('Tous les documents de la collection "Messages" ont été supprimés.');
+}
+
+
     db.collection('Joueurs').onSnapshot(displayPlayersList);
 
     document.getElementById('hostBtn').addEventListener('click', async () => {
@@ -196,6 +207,8 @@
         document.getElementById('codeContainer').style.display = 'block';
         await saveCodeToFirestore(code);
         document.querySelector('.button-container').style.display = 'none';
+
+        await clearMessagesCollection();
         
         document.getElementById('chatContainer').style.display = 'block';
         document.getElementById('startBtn').style.display = 'block';
