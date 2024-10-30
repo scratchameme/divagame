@@ -124,7 +124,7 @@
             await clearPlayersCollection();
             await db.collection('hostCodes').doc('codes').set({ code });
             console.log('Code sauvegardé dans Firestore :', code);
-            displayPlayersList();
+            displayPlayersList(); // Assurez-vous que cette fonction existe
         } catch (error) {
             console.error('Erreur lors de la sauvegarde du code:', error);
         }
@@ -158,6 +158,19 @@
         }
     }
 
+    async function displayPlayersList() {
+        const playersList = document.getElementById('playersList');
+        playersList.innerHTML = ''; // Vide la liste actuelle
+
+        const playersSnapshot = await db.collection('Joueurs').get();
+
+        playersSnapshot.forEach(doc => {
+            const li = document.createElement('li');
+            li.textContent = doc.data().username; // Affiche le pseudo du joueur
+            playersList.appendChild(li);
+        });
+    }
+
     async function displayMessages() {
         const messagesList = document.getElementById('messagesList');
         messagesList.innerHTML = '';
@@ -170,14 +183,9 @@
             messagesList.prepend(li); // Ajoute chaque message en haut de la liste
         });
 
-        // Si la liste contient plus de 6 messages, supprimer le plus ancien
-        if (messagesList.childElementCount > 6) {
-            messagesList.removeChild(messagesList.lastElementChild);
-        }
-
-        // Afficher un message si la liste est vide
-        if (messagesList.childElementCount === 0) {
-            const emptyMessage = document.createElement('p');
+        // Ajouter un message vide si aucun message n'existe
+        if (messagesList.children.length === 0) {
+            const emptyMessage = document.createElement('li');
             emptyMessage.textContent = 'Aucun message';
             messagesList.appendChild(emptyMessage);
         }
