@@ -46,6 +46,25 @@
         #finalPlayersList { font-size: 3em; font-weight: bold; color: #333; }
         .message-input { display: flex; align-items: center; justify-content: center; margin-top: 10px; }
         .message-input input[type="text"] { margin-right: 10px; flex-grow: 1; }
+        
+        /* Style du bouton Commencer */
+        #startBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            font-size: 1.2em;
+            background-color: #FF5722;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            display: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #startBtn:hover {
+            background-color: #E64A19;
+        }
     </style>
 </head>
 <body>
@@ -95,6 +114,9 @@
         </div>
     </div>
 </div>
+
+<!-- Bouton Commencer -->
+<button id="startBtn">Commencer</button>
 
 <script>
     let currentPlayerDocId;
@@ -176,6 +198,7 @@
         document.querySelector('.button-container').style.display = 'none';
         
         document.getElementById('chatContainer').style.display = 'block';
+        document.getElementById('startBtn').style.display = 'block';
     });
 
     document.getElementById('playerBtn').addEventListener('click', () => {
@@ -219,6 +242,12 @@
             saveMessageToFirestore(message);
             document.getElementById('playerMessage').value = '';
         }
+    });
+
+    // Gestion du bouton "Commencer"
+    document.getElementById('startBtn').addEventListener('click', () => {
+        document.querySelector('.container').style.display = 'none';
+        document.getElementById('startBtn').style.display = 'none';
     });
 </script>
 
