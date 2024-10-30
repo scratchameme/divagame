@@ -78,7 +78,8 @@
             margin-bottom: 20px;
         }
         #comingSoonBtn {
-            color: gray;
+            background-color: gray; /* Changez le fond du bouton en gris */
+            color: white; /* Couleur du texte en blanc */
         }
     </style>
 </head>
@@ -282,16 +283,17 @@
         document.getElementById('codeContainer').style.display = 'block';
         await saveCodeToFirestore(code);
         document.querySelector('.button-container').style.display = 'none';
-    
+        
         await clearMessagesCollection();
-    
+        
         document.getElementById('chatContainer').style.display = 'block';
         displayMessages();  // Appel de la fonction pour afficher les messages
-        // Gestion du bouton "Commencer"
-    document.getElementById('startBtn').addEventListener('click', () => {
-        document.querySelector('.container').style.display = 'none';
-        document.getElementById('startBtn').style.display = 'none';
-        document.getElementById('selectionContainer').style.display = 'block'; // Affiche les boutons Mini-jeux et ???
+    
+        // Vérifiez le nombre de joueurs et affichez le bouton "Commencer" si au moins un joueur est présent
+        const playersSnapshot = await db.collection('Joueurs').get();
+        if (playersSnapshot.size > 0) {
+            document.getElementById('startBtn').style.display = 'block';
+        }
     });
 
     });
