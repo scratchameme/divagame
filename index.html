@@ -183,96 +183,63 @@
             li.textContent = doc.data().username; // Affiche le pseudo du joueur
             playersList.appendChild(li);
         });
-
-        // Si la liste des joueurs est vide, ajouter un message
-        if (playersList.children.length === 0) {
-            const emptyMessage = document.createElement('li');
-            emptyMessage.textContent = 'Aucun joueur connecté';
-            playersList.appendChild(emptyMessage);
-        }
     }
 
     async function displayMessages() {
         const messagesList = document.getElementById('messagesList');
         messagesList.innerHTML = ''; // Vide la liste actuelle
 
-        const messagesSnapshot = await db.collection('Messages').orderBy('timestamp', 'desc').limit(6).get();
-
+        const messagesSnapshot = await db.collection('Messages').orderBy('timestamp').get();
         messagesSnapshot.forEach(doc => {
             const li = document.createElement('li');
-            li.textContent = `${doc.data().username}: ${doc.data().message}`; // Affiche le message avec le nom d'utilisateur
+            li.textContent = `${doc.data().username}: ${doc.data().message}`; // Affiche le pseudo et le message
             messagesList.appendChild(li);
         });
-
-        // Ajouter un message vide si aucun message n'existe
-        if (messagesList.children.length === 0) {
-            const emptyMessage = document.createElement('li');
-            emptyMessage.textContent = 'Aucun message';
-            messagesList.appendChild(emptyMessage);
-        }
     }
 
-    // Écouteur d'événements pour les messages
-    db.collection('Messages').orderBy('timestamp').onSnapshot((snapshot) => {
-        displayMessages();
-    });
-
     document.getElementById('hostBtn').addEventListener('click', async () => {
-        const code = generateRandomCode();
-        document.getElementById('hostCode').textContent = code;
-        await saveCodeToFirestore(code);
-
-        document.getElementById('codeContainer').style.display = 'block';
-        document.querySelector('.button-container').style.display = 'none';
-
-        // Afficher le conteneur de chat pour l'hôte uniquement
-        document.getElementById('chatContainer').style.display = 'block';
+        const hostCode = generateRandomCode();
+        document.getElementById('hostCode').textContent = hostCode;
+        document.getElementById('codeContainer').style.display = 'block'; // Affiche la zone de code
+        await saveCodeToFirestore(hostCode); // Enregistre le code dans Firestore
     });
 
     document.getElementById('playerBtn').addEventListener('click', () => {
-        document.getElementById('playerContainer').style.display = 'block';
-        document.querySelector('.button-container').style.display = 'none';
-
-        // S'assurer que le conteneur de chat reste caché pour le joueur
-        document.getElementById('chatContainer').style.display = 'none';
+        document.getElementById('playerContainer').style.display = 'block'; // Affiche la zone de connexion joueur
     });
 
     document.getElementById('confirmBtn').addEventListener('click', async () => {
         const playerCode = document.getElementById('playerCode').value;
-        const codeSnapshot = await db.collection('hostCodes').doc('codes').get();
-        const savedCode = codeSnapshot.data().code;
+        const hostCodeSnapshot = await db.collection('hostCodes').doc('codes').get();
 
-        if (playerCode === savedCode) {
-            document.getElementById('usernameContainer').style.display = 'block';
-            document.getElementById('playerContainer').style.display = 'none';
-            document.getElementById('errorMsg').textContent = '';
+        if (hostCodeSnapshot.exists && hostCodeSnapshot.data().code === playerCode) {
+            document.getElementById('usernameContainer').style.display = 'block'; // Affiche la zone de saisie du pseudo
+            document.getElementById('errorMsg').textContent = ''; // Efface le message d'erreur
         } else {
-            document.getElementById('errorMsg').textContent = 'Code incorrect, veuillez réessayer.';
+            document.getElementById('errorMsg').textContent = 'Code incorrect, veuillez réessayer.'; // Affiche le message d'erreur
         }
     });
 
     document.getElementById('submitUsernameBtn').addEventListener('click', async () => {
         const username = document.getElementById('username').value;
         if (username) {
-            currentPlayerDocId = await saveUsernameToFirestore(username);
-            if (currentPlayerDocId) {
-                const finalPlayersListContainer = document.getElementById('finalPlayersListContainer');
-                const finalPlayersList = document.getElementById('finalPlayersList');
-                finalPlayersList.innerHTML = '';
-                const li = document.createElement('li');
-                li.textContent = username;
-                finalPlayersList.appendChild(li);
-                finalPlayersListContainer.style.display = 'block';
-                document.getElementById('usernameContainer').style.display = 'none';
-            }
+            currentPlayerDocId = await saveUsernameToFirestore(username); // Sauvegarde le pseudo et récupère l'ID du document
+            document.getElementById('finalPlayersListContainer').style.display = 'block'; // Affiche la liste finale des joueurs
+            document.getElementById('finalPlayersList').innerHTML += `<li>${username}</li>`; // Ajoute le pseudo à la liste finale
+            displayMessages(); // Affiche les messages sauvegardés
+        } else {
+            alert('Veuillez entrer un pseudo valide.');
         }
     });
 
     document.getElementById('sendMessageBtn').addEventListener('click', async () => {
         const message = document.getElementById('playerMessage').value;
-        if (message) {
-            await saveMessageToFirestore(message, currentPlayerDocId);
-            document.getElementById('playerMessage').value = ''; // Efface le champ de saisie
+        if (message && currentPlayerDocId) {
+            await saveMessageToFirestore(message, currentPlayerDocId); // Sauvegarde le message avec l'ID du joueur
+            document.getElementById('playerMessage').value = ''; // Réinitialise le champ de message
+            displayMessages(); // Met à jour l'affichage des messages
+        } else {
+            alert('Veuillez entrer un message valide.');
         }
     });
 </script>
