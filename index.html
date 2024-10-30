@@ -28,7 +28,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: Arial, sans-serif; background-color: #f0f0f5; }
         .container { display: flex; width: 100%; max-width: 800px; padding: 20px; background-color: #ffffff; box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); border-radius: 10px; }
-        .chat-container { display: none; width: 200px; height: 350px; margin-right: 20px; border: 1px solid #ccc; border-radius: 5px; padding: 10px; overflow-y: auto; background-color: #f0f0f5; }
+        .chat-container { display: flex; flex-direction: column; width: 200px; height: 350px; margin-right: 20px; border: 1px solid #ccc; border-radius: 5px; padding: 10px; overflow-y: auto; background-color: #f0f0f5; }
         .main-container { flex-grow: 1; }
         h3 { margin-top: 20px; font-size: 1.5em; color: #333; }
         button { padding: 10px 20px; font-size: 1.2em; cursor: pointer; background-color: #4CAF50; color: #fff; border: none; border-radius: 5px; transition: background-color 0.3s ease; }
@@ -52,7 +52,9 @@
 <div class="container">
     <div class="chat-container" id="chatContainer">
         <h3>Chat</h3>
-        <p>Le chat apparaîtra ici.</p>
+        <ul id="messagesList">
+            <p>Aucun message</p>
+        </ul>
     </div>
 
     <div class="main-container">
@@ -156,24 +158,42 @@
         }
     }
 
-    async function displayPlayersList() {
-        const playersList = document.getElementById('playersList');
-        playersList.innerHTML = '';
-        const playersSnapshot = await db.collection('Joueurs').get();
-        playersSnapshot.forEach(doc => {
+    async function displayMessages() {
+        const messagesList = document.getElementById('messagesList');
+        messagesList.innerHTML = '';
+
+        const messagesSnapshot = await db.collection('Messages').orderBy('timestamp', 'desc').limit(6).get();
+
+        messagesSnapshot.forEach(doc => {
             const li = document.createElement('li');
-            li.textContent = doc.data().username;
-            playersList.appendChild(li);
+            li.textContent = `${doc.data().username}: ${doc.data().message}`;
+            messagesList.prepend(li); // Ajoute chaque message en haut de la liste
         });
+
+        // Si la liste contient plus de 6 messages, supprimer le plus ancien
+        if (messagesList.childElementCount > 6) {
+            messagesList.removeChild(messagesList.lastElementChild);
+        }
+
+        // Afficher un message si la liste est vide
+        if (messagesList.childElementCount === 0) {
+            const emptyMessage = document.createElement('p');
+            emptyMessage.textContent = 'Aucun message';
+            messagesList.appendChild(emptyMessage);
+        }
     }
 
-    db.collection('Joueurs').onSnapshot(displayPlayersList);
+    // Écouteur d'événements pour les messages
+    db.collection('Messages').orderBy('timestamp').onSnapshot((snapshot) => {
+        displayMessages();
+    });
 
     document.getElementById('hostBtn').addEventListener('click', async () => {
         const code = generateRandomCode();
         document.getElementById('hostCode').textContent = code;
-        document.getElementById('codeContainer').style.display = 'block';
         await saveCodeToFirestore(code);
+
+        document.getElementById('codeContainer').style.display = 'block';
         document.querySelector('.button-container').style.display = 'none';
         
         // Afficher le conteneur de chat pour l'hôte uniquement
