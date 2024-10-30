@@ -162,7 +162,7 @@
 
     function displayMessages(messages) {
         const messagesList = document.getElementById('messagesList');
-        messagesList.innerHTML = ''; // Réinitialise les messages
+        messagesList.innerHTML = '';
 
         messages.forEach(msg => {
             const messageDiv = document.createElement('div');
@@ -186,7 +186,6 @@
         document.getElementById('hostCode').textContent = code;
         saveCodeToFirestore(code);
         document.getElementById('chatContainer').style.display = 'block'; // Afficher le chat uniquement pour l'hébergeur
-        document.getElementById('messagesList').innerHTML = ''; // Réinitialise les messages
         document.querySelector('.button-container').style.display = 'none';
         document.getElementById('codeContainer').style.display = 'block';
     });
