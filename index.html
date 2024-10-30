@@ -185,12 +185,18 @@
     async function saveMessageToFirestore(message) {
         try {
             if (currentPlayerUsername && message) {
+                // Récupère la couleur sélectionnée par le joueur
+                const playerDoc = await db.collection('Joueurs').doc(currentPlayerDocId).get();
+                const color = playerDoc.exists ? playerDoc.data().color : '#000000';
+    
                 await db.collection('Messages').add({
                     username: currentPlayerUsername,
                     message: message,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()  // Ajoute un timestamp
+                    color: color,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 console.log('Message sauvegardé dans Firestore :', message);
+                await enforceMessageLimit(); // Limite les messages à 13
             }
         } catch (error) {
             console.error('Erreur lors de la sauvegarde du message:', error);
@@ -199,15 +205,13 @@
     
     async function displayMessages() {
         const chatContainer = document.getElementById('chatContainer');
-        chatContainer.innerHTML = '<h3>Chat</h3>';  // Titre du chat
+        chatContainer.innerHTML = '<h3>Chat</h3>';
         
         db.collection('Messages').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-            chatContainer.innerHTML = '<h3>Chat</h3>';  // Réinitialise l'affichage des messages
+            chatContainer.innerHTML = '<h3>Chat</h3>';
             snapshot.forEach(doc => {
                 const messageData = doc.data();
                 const messageElement = document.createElement('p');
-    
-                // Applique la couleur de l'utilisateur si elle est disponible
                 messageElement.innerHTML = `<strong style="color: ${messageData.color || '#000000'};">${messageData.username}:</strong> ${messageData.message}`;
                 chatContainer.appendChild(messageElement);
             });
@@ -229,6 +233,16 @@
             playersList.appendChild(li);
         });
     }
+
+    async function enforceMessageLimit() {
+        const messagesSnapshot = await db.collection('Messages').orderBy('timestamp').get();
+        if (messagesSnapshot.size > 13) {
+            const oldestMessageDoc = messagesSnapshot.docs[0];
+            await db.collection('Messages').doc(oldestMessageDoc.id).delete();
+            console.log('Message le plus ancien supprimé pour respecter la limite.');
+        }
+    }
+
 
     async function clearMessagesCollection() {
         const messagesSnapshot = await db.collection('Messages').get();
