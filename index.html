@@ -162,24 +162,33 @@
 
     function displayMessages(messages) {
         const messagesList = document.getElementById('messagesList');
-        messagesList.innerHTML = '';
+        messagesList.innerHTML = ''; // Réinitialiser le contenu à chaque fois
 
-        messages.forEach(msg => {
+        // Limiter le nombre de messages affichés
+        const maxMessages = 6;
+        messages.slice(-maxMessages).forEach(msg => {
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message';
             messageDiv.textContent = msg.message;
-            messagesList.prepend(messageDiv); // Ajoute le message au début pour que les nouveaux apparaissent en haut
+            messagesList.appendChild(messageDiv); // Ajoute le message à la fin
         });
         
-        // Limiter la hauteur du conteneur
-        const chatContainer = document.getElementById('chatContainer');
-        chatContainer.scrollTop = chatContainer.scrollHeight; // Défiler vers le bas
+        // Faire défiler vers le bas
+        messagesList.scrollTop = messagesList.scrollHeight; // faire défiler vers le bas
     }
 
-    db.collection('Messages').orderBy('timestamp', 'asc').onSnapshot(snapshot => {
-        const messages = snapshot.docs.map(doc => doc.data());
-        displayMessages(messages);
-    });
+    function displayPlayersList() {
+        const playersList = document.getElementById('playersList');
+        playersList.innerHTML = ''; // Réinitialiser la liste des joueurs
+
+        db.collection('Joueurs').get().then((snapshot) => {
+            snapshot.forEach((doc) => {
+                const li = document.createElement('li');
+                li.textContent = doc.data().username;
+                playersList.appendChild(li);
+            });
+        });
+    }
 
     document.getElementById('hostBtn').addEventListener('click', () => {
         const code = generateRandomCode();
@@ -188,6 +197,9 @@
         document.getElementById('chatContainer').style.display = 'block'; // Afficher le chat uniquement pour l'hébergeur
         document.querySelector('.button-container').style.display = 'none';
         document.getElementById('codeContainer').style.display = 'block';
+        
+        // Réinitialiser les messages du chat
+        document.getElementById('messagesList').innerHTML = ''; // Vider le conteneur des messages
     });
 
     document.getElementById('playerBtn').addEventListener('click', () => {
@@ -221,6 +233,15 @@
                 finalPlayersList.appendChild(li);
                 finalPlayersListContainer.style.display = 'block';
                 document.getElementById('usernameContainer').style.display = 'none';
+                
+                // Ecouter les messages en temps réel
+                db.collection('Messages').orderBy('timestamp', 'asc').onSnapshot(snapshot => {
+                    const messages = [];
+                    snapshot.forEach(doc => {
+                        messages.push(doc.data());
+                    });
+                    displayMessages(messages);
+                });
             }
         }
     });
