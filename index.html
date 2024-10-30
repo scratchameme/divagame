@@ -46,25 +46,6 @@
         #finalPlayersList { font-size: 3em; font-weight: bold; color: #333; }
         .message-input { display: flex; align-items: center; justify-content: center; margin-top: 10px; }
         .message-input input[type="text"] { margin-right: 10px; flex-grow: 1; }
-        
-        /* Style du bouton Commencer */
-        #startBtn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            font-size: 1.2em;
-            background-color: #FF5722;
-            color: #fff;
-            border: none;
-            border-radius: 50px;
-            display: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        #startBtn:hover {
-            background-color: #E64A19;
-        }
     </style>
 </head>
 <body>
@@ -115,11 +96,9 @@
     </div>
 </div>
 
-<!-- Bouton Commencer -->
-<button id="startBtn">Commencer</button>
-
 <script>
     let currentPlayerDocId;
+    let currentPlayerUsername;
 
     function generateRandomCode() {
         const digits = '0123456789';
@@ -140,9 +119,20 @@
         console.log('Tous les documents de la collection "Joueurs" ont été supprimés.');
     }
 
+    async function clearMessagesCollection() {
+        const messagesSnapshot = await db.collection('Messages').get();
+        const batch = db.batch();
+        messagesSnapshot.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+        await batch.commit();
+        console.log('Tous les documents de la collection "Messages" ont été supprimés.');
+    }
+
     async function saveCodeToFirestore(code) {
         try {
             await clearPlayersCollection();
+            await clearMessagesCollection(); // Supprime tous les messages existants
             await db.collection('hostCodes').doc('codes').set({ code });
             console.log('Code sauvegardé dans Firestore :', code);
             displayPlayersList();
@@ -159,6 +149,7 @@
             
             await db.collection('Joueurs').doc(playerDocId).set({ username });
             console.log('Pseudo sauvegardé dans Firestore :', username);
+            currentPlayerUsername = username; // Définit le pseudo pour sauvegarder le message
             return playerDocId;
         } catch (error) {
             console.error('Erreur lors de la sauvegarde du pseudo:', error);
@@ -168,8 +159,12 @@
 
     async function saveMessageToFirestore(message) {
         try {
-            if (currentPlayerDocId && message) {
-                await db.collection('Messages').doc(currentPlayerDocId).update({ message });
+            if (currentPlayerUsername && message) {
+                // Crée un document pour chaque message dans la collection "Messages"
+                await db.collection('Messages').add({
+                    username: currentPlayerUsername,
+                    message: message
+                });
                 console.log('Message sauvegardé dans Firestore :', message);
             }
         } catch (error) {
@@ -188,30 +183,13 @@
         });
     }
 
-    async function clearMessagesCollection() {
-    const messagesSnapshot = await db.collection('Messages').get();
-    const batch = db.batch();
-    messagesSnapshot.forEach(doc => {
-        batch.delete(doc.ref);
-    });
-    await batch.commit();
-    console.log('Tous les documents de la collection "Messages" ont été supprimés.');
-}
-
-
-    db.collection('Joueurs').onSnapshot(displayPlayersList);
-
     document.getElementById('hostBtn').addEventListener('click', async () => {
         const code = generateRandomCode();
         document.getElementById('hostCode').textContent = code;
         document.getElementById('codeContainer').style.display = 'block';
-        await saveCodeToFirestore(code);
         document.querySelector('.button-container').style.display = 'none';
-
-        await clearMessagesCollection();
-        
         document.getElementById('chatContainer').style.display = 'block';
-        document.getElementById('startBtn').style.display = 'block';
+        await saveCodeToFirestore(code);
     });
 
     document.getElementById('playerBtn').addEventListener('click', () => {
@@ -220,15 +198,15 @@
     });
 
     document.getElementById('confirmBtn').addEventListener('click', async () => {
-        const playerCode = document.getElementById('playerCode').value;
-        const codeSnapshot = await db.collection('hostCodes').doc('codes').get();
-        
-        if (codeSnapshot.exists && codeSnapshot.data().code === playerCode) {
+        const code = document.getElementById('playerCode').value;
+        const codeDoc = await db.collection('hostCodes').doc('codes').get();
+        const savedCode = codeDoc.exists ? codeDoc.data().code : null;
+        if (code === savedCode) {
             document.getElementById('playerContainer').style.display = 'none';
             document.getElementById('usernameContainer').style.display = 'block';
             document.getElementById('errorMsg').textContent = '';
         } else {
-            document.getElementById('errorMsg').textContent = 'Code incorrect, veuillez réessayer.';
+            document.getElementById('errorMsg').textContent = 'Code incorrect. Réessayez.';
         }
     });
 
@@ -253,14 +231,8 @@
         const message = document.getElementById('playerMessage').value;
         if (message) {
             saveMessageToFirestore(message);
-            document.getElementById('playerMessage').value = '';
+            document.getElementById('playerMessage').value = ''; // Efface le champ après envoi
         }
-    });
-
-    // Gestion du bouton "Commencer"
-    document.getElementById('startBtn').addEventListener('click', () => {
-        document.querySelector('.container').style.display = 'none';
-        document.getElementById('startBtn').style.display = 'none';
     });
 </script>
 
