@@ -4,73 +4,223 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interface Responsive - Hébergeur & Joueur</title>
-    
-    <!-- Lien vers le CSS externe -->
-    <link rel="stylesheet" href="styles.css">
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
-    <!-- Script principal -->
-    <script src="scripts.js" defer></script>
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyDejZmhxJ-wjwJ3-nE2I43vMmhRqgqhcxA",
+          authDomain: "divagame-97e7c.firebaseapp.com",
+          projectId: "divagame-97e7c",
+          storageBucket: "divagame-97e7c.appspot.com",
+          messagingSenderId: "253959990116",
+          appId: "1:253959990116:web:506a1d0cdf752823656871"
+        };
+
+        // Initialise Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
+
+    <style>
+        /* Styles principaux */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: Arial, sans-serif; background-color: #f0f0f5; }
+        .container { display: flex; width: 100%; max-width: 800px; padding: 20px; background-color: #ffffff; box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); border-radius: 10px; }
+        .chat-container { display: none; width: 200px; height: 350px; margin-right: 20px; border: 1px solid #ccc; border-radius: 5px; padding: 10px; overflow-y: auto; background-color: #f0f0f5; }
+        .main-container { flex-grow: 1; }
+        h3 { margin-top: 20px; font-size: 1.5em; color: #333; }
+        button { padding: 10px 20px; font-size: 1.2em; cursor: pointer; background-color: #4CAF50; color: #fff; border: none; border-radius: 5px; transition: background-color 0.3s ease; }
+        button:hover { background-color: #45a049; }
+        .button-container, #codeContainer, #playerContainer, #usernameContainer { text-align: center; width: 100%; }
+        #codeContainer, #playerContainer, #usernameContainer { display: none; font-size: 1.5em; margin-top: 20px; width: 100%; }
+        #errorMsg { color: red; font-size: 1.1em; margin-top: 10px; }
+        label { font-size: 1.2em; color: #333; margin-bottom: 8px; }
+        input[type="text"], textarea { width: 100%; max-width: 300px; padding: 10px; font-size: 1.1em; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 15px; }
+        ul { list-style-type: none; padding: 0; margin: 10px 0; width: 100%; text-align: center; }
+        ul li { font-size: 1.5em; color: #333; padding: 5px 0; border-bottom: 1px solid #eee; }
+        #hostCode { font-size: 3em; font-weight: bold; color: #4CAF50; text-align: center; }
+        #finalPlayersListContainer { display: none; text-align: center; margin-top: 20px; }
+        #finalPlayersList { font-size: 3em; font-weight: bold; color: #333; }
+        .message-input { display: flex; align-items: center; justify-content: center; margin-top: 10px; }
+        .message-input input[type="text"] { margin-right: 10px; flex-grow: 1; }
+    </style>
 </head>
 <body>
 
-    <!-- Inclusion du header -->
-    <div id="headerContainer">
-        <!-- Ce conteneur sera rempli par JavaScript -->
+<div class="container">
+    <div class="chat-container" id="chatContainer">
+        <h3>Chat</h3>
+        <p>Le chat apparaîtra ici.</p>
     </div>
 
-    <div class="container">
-        <div class="chat-container" id="chatContainer">
-            <h3>Chat</h3>
-            <p>Le chat apparaîtra ici.</p>
+    <div class="main-container">
+        <div class="button-container">
+            <button id="hostBtn">Hébergeur</button>
+            <button id="playerBtn">Joueur</button>
         </div>
 
-        <div class="main-container">
-            <div class="button-container">
-                <button id="hostBtn">Hébergeur</button>
-                <button id="playerBtn">Joueur</button>
+        <div id="codeContainer">
+            <p>Code : <strong><span id="hostCode"></span></strong></p>
+            <div id="playersListContainer">
+                <h3>Joueurs connectés :</h3>
+                <ul id="playersList"></ul>
             </div>
+        </div>
 
-            <div id="codeContainer">
-                <p>Code : <strong><span id="hostCode"></span></strong></p>
-                <div id="playersListContainer">
-                    <h3>Joueurs connectés :</h3>
-                    <ul id="playersList"></ul>
-                </div>
-            </div>
+        <div id="playerContainer">
+            <label for="playerCode">Code :</label>
+            <input type="text" id="playerCode" placeholder="Entrez le code">
+            <button id="confirmBtn">Confirmer</button>
+            <p id="errorMsg"></p>
+        </div>
 
-            <div id="playerContainer">
-                <label for="playerCode">Code :</label>
-                <input type="text" id="playerCode" placeholder="Entrez le code">
-                <button id="confirmBtn">Confirmer</button>
-                <p id="errorMsg"></p>
-            </div>
+        <div id="usernameContainer">
+            <label for="username">Pseudo :</label>
+            <input type="text" id="username" placeholder="Entrez votre pseudo">
+            <button id="submitUsernameBtn">Confirmer</button>
+        </div>
 
-            <div id="usernameContainer">
-                <label for="username">Pseudo :</label>
-                <input type="text" id="username" placeholder="Entrez votre pseudo">
-                <button id="submitUsernameBtn">Confirmer</button>
-            </div>
+        <div id="finalPlayersListContainer">
+            <h3>Nom du joueur :</h3>
+            <ul id="finalPlayersList"></ul>
 
-            <div id="finalPlayersListContainer">
-                <h3>Nom du joueur :</h3>
-                <ul id="finalPlayersList"></ul>
-
-                <div class="message-input">
-                    <input type="text" id="playerMessage" placeholder="Tapez votre message">
-                    <button id="sendMessageBtn">Envoyer</button>
-                </div>
+            <!-- Zone de message et bouton envoyer -->
+            <div class="message-input">
+                <input type="text" id="playerMessage" placeholder="Tapez votre message">
+                <button id="sendMessageBtn">Envoyer</button>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Inclusion du footer -->
-    <div id="footerContainer">
-        <!-- Ce conteneur sera rempli par JavaScript -->
-    </div>
+<script>
+    let currentPlayerDocId;
+
+    function generateRandomCode() {
+        const digits = '0123456789';
+        let code = '';
+        for (let i = 0; i < 3; i++) {
+            code += digits.charAt(Math.floor(Math.random() * digits.length));
+        }
+        return code;
+    }
+
+    async function clearPlayersCollection() {
+        const playersSnapshot = await db.collection('Joueurs').get();
+        const batch = db.batch();
+        playersSnapshot.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+        await batch.commit();
+        console.log('Tous les documents de la collection "Joueurs" ont été supprimés.');
+    }
+
+    async function saveCodeToFirestore(code) {
+        try {
+            await clearPlayersCollection();
+            await db.collection('hostCodes').doc('codes').set({ code });
+            console.log('Code sauvegardé dans Firestore :', code);
+            displayPlayersList();
+        } catch (error) {
+            console.error('Erreur lors de la sauvegarde du code:', error);
+        }
+    }
+
+    async function saveUsernameToFirestore(username) {
+        try {
+            const playersSnapshot = await db.collection('Joueurs').get();
+            const playerCount = playersSnapshot.size + 1;
+            const playerDocId = `Player${playerCount}`;
+            
+            await db.collection('Joueurs').doc(playerDocId).set({ username });
+            console.log('Pseudo sauvegardé dans Firestore :', username);
+            return playerDocId;
+        } catch (error) {
+            console.error('Erreur lors de la sauvegarde du pseudo:', error);
+            return null;
+        }
+    }
+
+    async function saveMessageToFirestore(message) {
+        try {
+            if (currentPlayerDocId && message) {
+                await db.collection('Joueurs').doc(currentPlayerDocId).update({ message });
+                console.log('Message sauvegardé dans Firestore :', message);
+            }
+        } catch (error) {
+            console.error('Erreur lors de la sauvegarde du message:', error);
+        }
+    }
+
+    async function displayPlayersList() {
+        const playersList = document.getElementById('playersList');
+        playersList.innerHTML = '';
+        const playersSnapshot = await db.collection('Joueurs').get();
+        playersSnapshot.forEach(doc => {
+            const li = document.createElement('li');
+            li.textContent = doc.data().username;
+            playersList.appendChild(li);
+        });
+    }
+
+    db.collection('Joueurs').onSnapshot(displayPlayersList);
+
+    document.getElementById('hostBtn').addEventListener('click', async () => {
+        const code = generateRandomCode();
+        document.getElementById('hostCode').textContent = code;
+        document.getElementById('codeContainer').style.display = 'block';
+        await saveCodeToFirestore(code);
+        document.querySelector('.button-container').style.display = 'none';
+        
+        document.getElementById('chatContainer').style.display = 'block';
+    });
+
+    document.getElementById('playerBtn').addEventListener('click', () => {
+        document.getElementById('playerContainer').style.display = 'block';
+        document.querySelector('.button-container').style.display = 'none';
+    });
+
+    document.getElementById('confirmBtn').addEventListener('click', async () => {
+        const playerCode = document.getElementById('playerCode').value;
+        const codeSnapshot = await db.collection('hostCodes').doc('codes').get();
+        
+        if (codeSnapshot.exists && codeSnapshot.data().code === playerCode) {
+            document.getElementById('playerContainer').style.display = 'none';
+            document.getElementById('usernameContainer').style.display = 'block';
+            document.getElementById('errorMsg').textContent = '';
+        } else {
+            document.getElementById('errorMsg').textContent = 'Code incorrect, veuillez réessayer.';
+        }
+    });
+
+    document.getElementById('submitUsernameBtn').addEventListener('click', async () => {
+        const username = document.getElementById('username').value;
+        if (username) {
+            currentPlayerDocId = await saveUsernameToFirestore(username);
+            if (currentPlayerDocId) {
+                const finalPlayersListContainer = document.getElementById('finalPlayersListContainer');
+                const finalPlayersList = document.getElementById('finalPlayersList');
+                finalPlayersList.innerHTML = '';
+                const li = document.createElement('li');
+                li.textContent = username;
+                finalPlayersList.appendChild(li);
+                finalPlayersListContainer.style.display = 'block';
+                document.getElementById('usernameContainer').style.display = 'none';
+            }
+        }
+    });
+
+    document.getElementById('sendMessageBtn').addEventListener('click', () => {
+        const message = document.getElementById('playerMessage').value;
+        if (message) {
+            saveMessageToFirestore(message);
+            document.getElementById('playerMessage').value = '';
+        }
+    });
+</script>
 
 </body>
 </html>
