@@ -344,8 +344,13 @@
     });
 
     // Gestion du bouton "Commencer"
+    // Ajoutez ce gestionnaire d'événements pour le bouton "Commencer"
     document.getElementById('startBtn').addEventListener('click', () => {
-        document.querySelector('.container').style.display = 'none';
-        document.getElementById('startBtn').style.display = 'none';
+        document.querySelector('.container').style.display = 'none'; // Cache la partie principale
+        document.getElementById('startBtn').style.display = 'none'; // Cache le bouton "Commencer"
+    
+        // Affiche les boutons "Mini-jeux" et "???"
+        document.getElementById('selectionContainer').style.display = 'block'; // Affiche le conteneur des boutons
     });
+
 </script>
