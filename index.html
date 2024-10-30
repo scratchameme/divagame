@@ -168,20 +168,36 @@
         }
     }
 
-    async function saveMessageToFirestore(message) {
+async function saveMessageToFirestore(message) {
     try {
         if (currentPlayerUsername && message) {
-            // Crée un document pour chaque message dans la collection "Messages"
             await db.collection('Messages').add({
                 username: currentPlayerUsername,
-                message: message
+                message: message,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()  // Ajoute un timestamp
             });
             console.log('Message sauvegardé dans Firestore :', message);
         }
     } catch (error) {
         console.error('Erreur lors de la sauvegarde du message:', error);
     }
-}
+    
+    async function displayMessages() {
+        const chatContainer = document.getElementById('chatContainer');
+        chatContainer.innerHTML = '<h3>Chat</h3>';  // Titre du chat
+        
+        db.collection('Messages').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+            chatContainer.innerHTML = '<h3>Chat</h3>';  // Réinitialise l'affichage des messages
+            snapshot.forEach(doc => {
+                const messageData = doc.data();
+                const messageElement = document.createElement('p');
+                messageElement.innerHTML = `<strong>${messageData.username}:</strong> ${messageData.message}`;
+                chatContainer.appendChild(messageElement);
+            });
+        });
+    }
+
+
 
     async function displayPlayersList() {
         const playersList = document.getElementById('playersList');
@@ -213,12 +229,14 @@
         document.getElementById('codeContainer').style.display = 'block';
         await saveCodeToFirestore(code);
         document.querySelector('.button-container').style.display = 'none';
-
+    
         await clearMessagesCollection();
-        
+    
         document.getElementById('chatContainer').style.display = 'block';
+        displayMessages();  // Appel de la fonction pour afficher les messages
         document.getElementById('startBtn').style.display = 'block';
     });
+
 
     document.getElementById('playerBtn').addEventListener('click', () => {
         document.getElementById('playerContainer').style.display = 'block';
@@ -251,9 +269,12 @@
                 finalPlayersList.appendChild(li);
                 finalPlayersListContainer.style.display = 'block';
                 document.getElementById('usernameContainer').style.display = 'none';
+                
+                displayMessages();  // Appel de la fonction pour afficher les messages
             }
         }
     });
+
 
     document.getElementById('sendMessageBtn').addEventListener('click', () => {
         const message = document.getElementById('playerMessage').value;
