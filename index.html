@@ -181,7 +181,7 @@
         try {
             const playersSnapshot = await db.collection('Joueurs').get();
             const playerCount = playersSnapshot.size + 1;
-            const playerDocId = Player${playerCount};
+            const playerDocId = `Player${playerCount}`;
     
             // Récupère la couleur choisie par le joueur
             const color = document.getElementById('colorPicker').value;
