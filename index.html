@@ -58,12 +58,27 @@
             color: #fff;
             border: none;
             border-radius: 50px;
-            display: none;
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
         #startBtn:hover {
             background-color: #E64A19;
+        }
+
+        /* Style pour le conteneur de sélection */
+        #selectionContainer {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        #miniGamesBtn, #comingSoonBtn {
+            width: 80%;
+            padding: 20px;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        #comingSoonBtn {
+            color: gray;
         }
     </style>
 </head>
@@ -107,12 +122,6 @@
             <button id="submitUsernameBtn">Confirmer</button>
         </div>
 
-        <div id="selectionContainer" style="display: none; text-align: center; padding: 20px;">
-            <button id="miniGamesBtn" style="width: 80%; padding: 20px; font-size: 2em; margin-bottom: 20px;">Mini-jeux</button>
-            <button id="comingSoonBtn" style="width: 80%; padding: 20px; font-size: 2em; color: gray;" disabled>???<br><small>Bientôt disponible...</small></button>
-        </div>
-
-
         <div id="finalPlayersListContainer">
             <h3>Nom du joueur :</h3>
             <ul id="finalPlayersList"></ul>
@@ -126,6 +135,11 @@
     </div>
 </div>
 
+    <!-- Conteneur pour les boutons Mini-jeux et ??? -->
+<div id="selectionContainer" style="display: none; text-align: center; padding: 20px;">
+    <button id="miniGamesBtn">Mini-jeux</button>
+    <button id="comingSoonBtn" disabled>???<br><small>Bientôt disponible...</small></button>
+</div>
 <!-- Bouton Commencer -->
 <button id="startBtn">Commencer</button>
 
