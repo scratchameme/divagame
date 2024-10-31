@@ -10,22 +10,27 @@
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
             color: #333;
+            display: flex;
+            align-items: center; /* Centre verticalement */
+            height: 100vh; /* Prend toute la hauteur de la fenêtre */
+            margin: 0; /* Enlève le margin par défaut */
         }
         .container {
             width: 250px; /* Largeur du conteneur */
-            height: auto; /* Hauteur s'adapte à son contenu */
+            height: 390px; /* Hauteur du conteneur */
             position: absolute; /* Position absolue */
             left: 0px; /* Alignement à gauche */
-            margin: 20px; /* Espace pour éviter que le conteneur soit collé au bord de l'écran */
+            margin-top: auto; /* Permet d'utiliser flex pour centrer verticalement */
+            margin-bottom: auto; /* Permet d'utiliser flex pour centrer verticalement */
             background: #fff; /* Fond blanc pour le conteneur */
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         .chat-container {
             display: none; /* Cacher par défaut */
-            width: 200px; /* Largeur souhaitée */
-            height: 350px; /* Hauteur souhaitée */
-            margin-right: 20px;
+            width: 190px; /* Largeur du chat */
+            height: 350px; /* Hauteur du chat */
+            margin: 20px; /* Espacement autour du chat */
             border: 1px solid #ccc;
             border-radius: 5px;
             padding: 10px;
