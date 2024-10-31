@@ -354,20 +354,30 @@
 
     // Ajoutez ce gestionnaire d'événements pour le bouton "Commencer"
     document.getElementById('startBtn').addEventListener('click', () => {
-        // Cacher tout sauf le chat
-        document.querySelector('.container').style.display = 'none'; // Cache la partie principale
-        document.getElementById('startBtn').style.display = 'none'; // Cache le bouton "Commencer"
-        
-        // Afficher le chat et changer sa position
-        const chatContainer = document.getElementById('chatContainer');
-        chatContainer.style.position = 'absolute'; // Positionnement absolu
-        chatContainer.style.left = '20px'; // Décalage à gauche
-        chatContainer.style.top = '20px'; // Espace en haut
-        chatContainer.style.display = 'block'; // Assure que le chat est affiché
+        // Cache tous les éléments à l'intérieur de .container, sauf le chat
+        const mainContainer = document.querySelector('.main-container');
+        const buttonContainer = document.querySelector('.button-container');
+        const codeContainer = document.getElementById('codeContainer');
+        const playerContainer = document.getElementById('playerContainer');
+        const usernameContainer = document.getElementById('usernameContainer');
+        const finalPlayersListContainer = document.getElementById('finalPlayersListContainer');
     
-        // Afficher les boutons "Mini-jeux" et "???"
+        // Cacher tous sauf le chat
+        mainContainer.style.display = 'none'; 
+        buttonContainer.style.display = 'none'; 
+        codeContainer.style.display = 'none';
+        playerContainer.style.display = 'none';
+        usernameContainer.style.display = 'none';
+        finalPlayersListContainer.style.display = 'none';
+        
+        // Affiche le chat
+        const chatContainer = document.getElementById('chatContainer');
+        chatContainer.style.display = 'block'; // Assurez-vous que le chat est visible
+    
+        // Affiche les boutons "Mini-jeux" et "???"
         document.getElementById('selectionContainer').style.display = 'block'; // Affiche le conteneur des boutons
     });
+
 
 
 </script>
