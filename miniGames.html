@@ -1,11 +1,10 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini-jeux</title>
     
-    <!-- Ici vous pouvez coller votre style CSS provenant de index.html -->
     <style>
         /* Exemples de styles, remplacez ceci par vos styles réels */
         body {
@@ -20,16 +19,21 @@
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative; /* Pour que le conteneur de chat puisse être positionné */
         }
         .chat-container {
+            display: none; /* Cacher par défaut */
+            width: 200px; /* Largeur souhaitée */
+            height: 350px; /* Hauteur souhaitée */
+            margin-right: 20px;
             border: 1px solid #ccc;
+            border-radius: 5px;
             padding: 10px;
-            margin-top: 20px;
-            height: 300px;
-            overflow-y: scroll;
-            background: #fafafa;
+            overflow-y: auto;
+            background-color: #f0f0f5;
+            position: absolute; /* Pour pouvoir le déplacer */
+            left: 0px; /* Positionnement à gauche */
         }
-        /* Ajoutez tous les autres styles que vous avez dans index.html ici */
     </style>
 
     <!-- Firebase SDK -->
@@ -63,7 +67,7 @@
 
             async function displayMessages() {
                 const chatContainer = document.getElementById('chatContainer');
-                chatContainer.innerHTML = '<h3>Chat</h3>'; // Réinitialise le contenu
+                chatContainer.style.display = 'block'; // Affiche le conteneur de chat
                 
                 db.collection('Messages').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
                     chatContainer.innerHTML = '<h3>Chat</h3>'; // Réinitialise le contenu
