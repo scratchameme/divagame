@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini-jeux</title>
+    <title>Fill in the Blanks</title>
     
     <style>
         body {
@@ -16,15 +16,15 @@
             margin: 0; /* Enlève le margin par défaut */
             justify-content: center; /* Centre horizontalement */
         }
-        .container {
+        .fillInTheBlanks-container {
             width: 250px; /* Largeur du conteneur */
             height: 390px; /* Hauteur du conteneur */
             background: #fff; /* Fond blanc pour le conteneur */
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             display: flex;
-            flex-direction: column; /* Aligne le contenu du chat verticalement */
-            justify-content: center; /* Centre le contenu verticalement */
+            flex-direction: column; /* Aligne le contenu verticalement */
+            justify-content: flex-start; /* Aligne le contenu vers le haut */
             padding: 20px; /* Padding autour du contenu */
             position: absolute; /* Position absolue */
             left: 0; /* Aligné à gauche */
@@ -49,32 +49,12 @@
         .chat-container p {
             margin: 0; /* Enlève l'espacement vertical entre les messages */
         }
-        .button-container {
-            display: flex;
-            flex-direction: column; /* Aligne le texte et le bouton en colonne */
-            align-items: center; /* Centre horizontalement */
-            position: absolute; /* Position absolue pour le centrer */
-            top: 50%; /* Déplacement vers le bas */
-            transform: translateY(-50%); /* Centre verticalement */
-        }
-        #fillInTheBlanksBtn {
-            padding: 15px 30px;
-            font-size: 1.5em;
-            cursor: pointer;
-            background-color: #4CAF50;
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            transition: background-color 0.3s ease;
-        }
-        #fillInTheBlanksBtn:hover {
-            background-color: #45a049;
-        }
         h1 {
             font-size: 2em; /* Taille de la police pour le titre */
             font-weight: bold; /* Met le texte en gras */
             margin: 0; /* Enlève le margin par défaut */
             margin-bottom: 20px; /* Espacement au-dessous du titre */
+            text-align: center; /* Centre le texte */
         }
     </style>
 
@@ -83,24 +63,15 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <div class="container">
+    <div class="fillInTheBlanks-container">
+        <h1>Fill in the blanks</h1> <!-- Titre pour le jeu -->
         <div class="chat-container" id="chatContainer">
             <h3>Chat</h3>
             <p>Le chat apparaîtra ici.</p>
         </div>
     </div>
 
-    <div class="button-container">
-        <h1>Mini-jeux</h1> <!-- Titre pour les mini-jeux -->
-        <button id="fillInTheBlanksBtn">Fill in the blanks</button>
-    </div>
-
     <script>
-        // Fonction pour rediriger vers FillInTheBlanks.html lorsque le bouton est cliqué
-        document.getElementById('fillInTheBlanksBtn').addEventListener('click', function() {
-            window.location.href = 'FillInTheBlanks.html';
-        });
-
         document.addEventListener("DOMContentLoaded", function() {
             const firebaseConfig = {
                 apiKey: "AIzaSyDejZmhxJ-wjwJ3-nE2I43vMmhRqgqhcxA",
