@@ -178,6 +178,11 @@
         return code;
     }
 
+        // Redirige vers index.html si l'utilisateur arrive directement sur miniGames.html
+    if (document.referrer.indexOf('index.html') === -1) {
+        window.location.href = 'index.html';
+    }
+
     async function clearPlayersCollection() {
         const playersSnapshot = await db.collection('Joueurs').get();
         const batch = db.batch();
