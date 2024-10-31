@@ -306,6 +306,7 @@
 
     document.getElementById('hostBtn').addEventListener('click', async () => {
         const code = generateRandomCode();
+        document.getElementById('slider').style.display = 'none';
         document.getElementById('hostCode').textContent = code;
         document.getElementById('codeContainer').style.display = 'block';
         await saveCodeToFirestore(code);
@@ -321,6 +322,7 @@
     });
 
     document.getElementById('playerBtn').addEventListener('click', () => {
+        document.getElementById('slider').style.display = 'none';
         document.getElementById('playerContainer').style.display = 'block';
         document.querySelector('.button-container').style.display = 'none';
     });
@@ -389,9 +391,18 @@
     // Gestion du bouton "Commencer"
     // Ajoutez ce gestionnaire d'événements pour le bouton "Commencer"
     document.getElementById('startBtn').addEventListener('click', () => {
-        document.querySelector('.container').style.display = 'none'; // Cache la partie principale
-        document.getElementById('startBtn').style.display = 'none'; // Cache le bouton "Commencer"
-    
+        document.querySelector('.main-container').style.display = 'none';
+        document.getElementById('startBtn').style.display = 'none';
+        document.getElementById('selectionContainer').style.display = 'block'; // Affiche les boutons "Mini-jeux" et "???"
+        
+        // Repositionne le chat à gauche et affiche-le
+        const chatContainer = document.getElementById('chatContainer');
+        chatContainer.style.position = 'fixed';
+        chatContainer.style.left = '0';
+        chatContainer.style.top = '0';
+        chatContainer.style.height = '100vh';
+        chatContainer.style.display = 'block'; 
+    }); 
         // Affiche les boutons "Mini-jeux" et "???"
         document.getElementById('selectionContainer').style.display = 'block'; // Affiche le conteneur des boutons
     });
