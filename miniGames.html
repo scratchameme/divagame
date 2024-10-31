@@ -11,38 +11,45 @@
             background-color: #f0f0f0;
             color: #333;
             display: flex;
-            align-items: center; /* Centre verticalement */
+            align-items: center;
+            justify-content: center;
             height: 100vh; /* Prend toute la hauteur de la fenêtre */
             margin: 0; /* Enlève le margin par défaut */
         }
         .container {
             width: 250px; /* Largeur du conteneur */
             height: 390px; /* Hauteur du conteneur */
-            position: absolute; /* Position absolue */
-            left: 0px; /* Alignement à gauche */
-            margin-top: auto; /* Permet d'utiliser flex pour centrer verticalement */
-            margin-bottom: auto; /* Permet d'utiliser flex pour centrer verticalement */
+            position: relative; /* Position relative pour le contenu du chat */
             background: #fff; /* Fond blanc pour le conteneur */
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center; /* Centre le texte horizontalement */
         }
         .chat-container {
             display: block; /* Affiche le conteneur de chat */
             width: 190px; /* Largeur du chat */
             height: 350px; /* Hauteur du chat */
-            max-width: 250px; /* Largeur maximale du chat */
-            max-height: 390px; /* Hauteur maximale du chat */
-            margin: 20px; /* Espacement autour du chat */
+            margin: 20px auto; /* Espacement autour du chat */
             border: 1px solid #ccc;
             border-radius: 5px;
-            padding: 10px; /* Padding du chat */
-            overflow-y: hidden; /* Cache les barres de défilement verticales */
-            overflow-x: hidden; /* Cache les barres de défilement horizontales */
-            background-color: #f0f0f5;
+            padding: 10px; /* Espace interne */
+            overflow: auto; /* Permet de faire défiler le contenu si nécessaire */
+            background-color: #f0f0f5; /* Couleur de fond du chat */
             position: relative; /* Pour garder le chat à l'intérieur du conteneur */
         }
-        .chat-container p {
-            margin: 0; /* Enlève l'espacement vertical entre les messages */
+        #fillInTheBlanksBtn {
+            padding: 15px 30px;
+            font-size: 1.5em;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
+            margin: 10px; /* Marge pour le bouton */
+        }
+        #fillInTheBlanksBtn:hover {
+            background-color: #45a049;
         }
     </style>
 
@@ -52,11 +59,15 @@
 </head>
 <body>
     <div class="container">
+        <h1>Mini-jeux</h1>
+        
+        <!-- Button with tooltip -->
+        <button id="fillInTheBlanksBtn">Fill in the blanks</button>
+
         <div class="chat-container" id="chatContainer">
             <h3>Chat</h3>
             <p>Le chat apparaîtra ici.</p>
         </div>
-        <!-- Autres contenus de votre page -->
     </div>
 
     <script>
@@ -78,7 +89,7 @@
                 const chatContainer = document.getElementById('chatContainer');
                 chatContainer.style.display = 'block'; // Affiche le conteneur de chat
                 
-                db.collection('Messages').orderBy('timestamp', 'desc').onSnapshot(async snapshot => {
+                db.collection('Messages').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
                     chatContainer.innerHTML = '<h3>Chat</h3>'; // Réinitialise le contenu
                     snapshot.forEach(doc => {
                         const messageData = doc.data();
@@ -86,23 +97,17 @@
                         messageElement.innerHTML = `<strong style="color: ${messageData.color || '#000000'};">${messageData.username}:</strong> ${messageData.message}`;
                         chatContainer.appendChild(messageElement);
                     });
-                    
-                    // Appel à la fonction pour s'assurer que la limite de messages est respectée
-                    await enforceMessageLimit();
                 });
-            }
-
-            async function enforceMessageLimit() {
-                const messagesSnapshot = await db.collection('Messages').orderBy('timestamp').get();
-                if (messagesSnapshot.size > 13) {
-                    const oldestMessageDoc = messagesSnapshot.docs[0];
-                    await db.collection('Messages').doc(oldestMessageDoc.id).delete();
-                    console.log('Message le plus ancien supprimé pour respecter la limite.');
-                }
             }
 
             // Appel à la fonction pour afficher les messages lors du chargement de la page
             displayMessages();
+
+            // Ajoutez ici les fonctionnalités du mini-jeu si nécessaire
+            document.getElementById('fillInTheBlanksBtn').addEventListener('click', () => {
+                alert("Chargement du jeu 'Fill in the blanks' !");
+                // Rediriger ou charger la logique du jeu ici
+            });
         });
     </script>
 </body>
