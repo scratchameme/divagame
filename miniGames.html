@@ -6,20 +6,20 @@
     <title>Mini-jeux</title>
     
     <style>
-        /* Exemples de styles, remplacez ceci par vos styles réels */
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
             color: #333;
         }
         .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #fff;
+            width: 250px; /* Largeur du conteneur */
+            height: auto; /* Hauteur s'adapte à son contenu */
+            position: absolute; /* Position absolue */
+            left: 0px; /* Alignement à gauche */
+            margin: 20px; /* Espace pour éviter que le conteneur soit collé au bord de l'écran */
+            background: #fff; /* Fond blanc pour le conteneur */
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            position: relative; /* Pour que le conteneur de chat puisse être positionné */
         }
         .chat-container {
             display: none; /* Cacher par défaut */
@@ -31,8 +31,7 @@
             padding: 10px;
             overflow-y: auto;
             background-color: #f0f0f5;
-            position: absolute; /* Pour pouvoir le déplacer */
-            left: 0px; /* Positionnement à gauche */
+            position: relative; /* Pour garder le chat à l'intérieur du conteneur */
         }
     </style>
 
@@ -42,7 +41,6 @@
 </head>
 <body>
     <div class="container">
-        <h1>Bienvenue dans le Mini-jeux</h1>
         <div class="chat-container" id="chatContainer">
             <h3>Chat</h3>
             <p>Le chat apparaîtra ici.</p>
