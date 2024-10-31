@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini-jeux</title>
+    <style>
+        /* Style pour le conteneur de mini-jeux */
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f5;
+            margin: 0;
+        }
+        #miniGameContainer {
+            text-align: center;
+        }
+        #fillInTheBlanksBtn {
+            padding: 15px 30px;
+            font-size: 1.5em;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
+        }
+        #fillInTheBlanksBtn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div id="miniGameContainer">
+        <h1>Mini-jeux</h1>
+        <button id="fillInTheBlanksBtn">Fill in the blanks</button>
+    </div>
+
+    <script>
+        // Ajoutez ici les fonctionnalités du mini-jeu
+
+        document.getElementById('fillInTheBlanksBtn').addEventListener('click', () => {
+            alert("Chargement du jeu 'Fill in the blanks' !");
+            // Rediriger ou charger la logique du jeu ici
+        });
+    </script>
+</body>
+</html>
