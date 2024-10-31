@@ -14,6 +14,7 @@
             align-items: center; /* Centre verticalement */
             height: 100vh; /* Prend toute la hauteur de la fenêtre */
             margin: 0; /* Enlève le margin par défaut */
+            justify-content: center; /* Centre horizontalement */
         }
         .container {
             width: 250px; /* Largeur du conteneur */
@@ -52,8 +53,9 @@
             display: flex;
             flex-direction: column; /* Aligne le texte et le bouton en colonne */
             align-items: center; /* Centre horizontalement */
-            margin-left: 20px; /* Ajoute un espacement à gauche */
-            margin-top: 20px; /* Espacement au-dessus du bouton */
+            position: absolute; /* Position absolue pour le centrer */
+            top: 50%; /* Déplacement vers le bas */
+            transform: translateY(-50%); /* Centre verticalement */
         }
         #fillInTheBlanksBtn {
             padding: 15px 30px;
