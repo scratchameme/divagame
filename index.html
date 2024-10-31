@@ -352,7 +352,7 @@
         window.location.href = 'miniGames.html';
     });
 
-    // Ajoutez ce gestionnaire d'événements pour le bouton "Commencer"
+        // Ajoutez ce gestionnaire d'événements pour le bouton "Commencer"
     document.getElementById('startBtn').addEventListener('click', () => {
         // Cache tous les éléments à l'intérieur de .container, sauf le chat
         const mainContainer = document.querySelector('.main-container');
@@ -372,12 +372,14 @@
         
         // Affiche le chat
         const chatContainer = document.getElementById('chatContainer');
-        chatContainer.style.display = 'block'; // Assurez-vous que le chat est visible
-    
-        // Affiche les boutons "Mini-jeux" et "???"
-        document.getElementById('selectionContainer').style.display = 'block'; // Affiche le conteneur des boutons
-    });
-
-
+        chatContainer.style.display = 'block'; // Assure que le chat est visible
+        
+        // Ajuste la taille de .container pour s'adapter au chat
+        const container = document.querySelector('.container');
+        container.style.width = '300px'; // Ajustez cette valeur pour la largeur désirée
+        container.style.height = 'auto'; // Permet au conteneur de s'adapter à la taille du chat
+        container.style.position = 'absolute'; // Change la position pour pouvoir le déplacer
+        container.style.left = '200px'; // Déplace le conteneur vers la gauche
+    })
 
 </script>
