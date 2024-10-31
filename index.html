@@ -80,27 +80,6 @@
         #comingSoonBtn {
             color: gray;
         }
-        #startSlider {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            width: 50px;
-            height: 50px;
-            background-color: #FF5722;
-            color: #fff;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2em;
-            transition: background-color 0.3s ease;
-            z-index: 1000; /* Au-dessus des autres éléments */
-        }
-        
-        #startSlider:hover {
-            background-color: #E64A19;
-        }
     </style>
 </head>
 <body>
@@ -155,9 +134,6 @@
         </div>
     </div>
 </div>
-
-<!-- Slider en bas à gauche de l'écran -->
-<div id="startSlider">▶</div>
     <!-- Conteneur pour les boutons Mini-jeux et ??? -->
 <div id="selectionContainer" style="display: none; text-align: center; padding: 20px;">
     <button id="miniGamesBtn">Mini-jeux</button>
@@ -306,7 +282,6 @@
 
     document.getElementById('hostBtn').addEventListener('click', async () => {
         const code = generateRandomCode();
-        document.getElementById('slider').style.display = 'none';
         document.getElementById('hostCode').textContent = code;
         document.getElementById('codeContainer').style.display = 'block';
         await saveCodeToFirestore(code);
@@ -322,7 +297,6 @@
     });
 
     document.getElementById('playerBtn').addEventListener('click', () => {
-        document.getElementById('slider').style.display = 'none';
         document.getElementById('playerContainer').style.display = 'block';
         document.querySelector('.button-container').style.display = 'none';
     });
@@ -371,13 +345,7 @@
             saveMessageToFirestore(message);
             document.getElementById('playerMessage').value = '';
         }
-    });
-
-    // Gestion du slider
-    document.getElementById('startSlider').addEventListener('click', () => {
-        document.querySelector('.container').style.display = 'none'; // Cache la partie principale
-        document.getElementById('startSlider').style.display = 'none'; // Cache le slider
-    
+    });    
         // Affiche les boutons "Mini-jeux" et "???"
         document.getElementById('selectionContainer').style.display = 'block'; // Affiche le conteneur des boutons
     });
@@ -391,19 +359,11 @@
     // Gestion du bouton "Commencer"
     // Ajoutez ce gestionnaire d'événements pour le bouton "Commencer"
     document.getElementById('startBtn').addEventListener('click', () => {
-        document.querySelector('.main-container').style.display = 'none';
-        document.getElementById('startBtn').style.display = 'none';
-        document.getElementById('selectionContainer').style.display = 'block'; // Affiche les boutons "Mini-jeux" et "???"
-        
-        // Repositionne le chat à gauche et affiche-le
-        const chatContainer = document.getElementById('chatContainer');
-        chatContainer.style.position = 'fixed';
-        chatContainer.style.left = '0';
-        chatContainer.style.top = '0';
-        chatContainer.style.height = '100vh';
-        chatContainer.style.display = 'block'; 
-    }); 
+        document.querySelector('.container').style.display = 'none'; // Cache la partie principale
+        document.getElementById('startBtn').style.display = 'none'; // Cache le bouton "Commencer"
+    
         // Affiche les boutons "Mini-jeux" et "???"
         document.getElementById('selectionContainer').style.display = 'block'; // Affiche le conteneur des boutons
+    });
 
 </script>
