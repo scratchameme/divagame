@@ -80,6 +80,27 @@
         #comingSoonBtn {
             color: gray;
         }
+        #startSlider {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: #FF5722;
+            color: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            transition: background-color 0.3s ease;
+            z-index: 1000; /* Au-dessus des autres éléments */
+        }
+        
+        #startSlider:hover {
+            background-color: #E64A19;
+        }
     </style>
 </head>
 <body>
@@ -135,6 +156,8 @@
     </div>
 </div>
 
+<!-- Slider en bas à gauche de l'écran -->
+<div id="startSlider">▶</div>
     <!-- Conteneur pour les boutons Mini-jeux et ??? -->
 <div id="selectionContainer" style="display: none; text-align: center; padding: 20px;">
     <button id="miniGamesBtn">Mini-jeux</button>
@@ -342,6 +365,16 @@
             document.getElementById('playerMessage').value = '';
         }
     });
+
+    // Gestion du slider
+    document.getElementById('startSlider').addEventListener('click', () => {
+        document.querySelector('.container').style.display = 'none'; // Cache la partie principale
+        document.getElementById('startSlider').style.display = 'none'; // Cache le slider
+    
+        // Affiche les boutons "Mini-jeux" et "???"
+        document.getElementById('selectionContainer').style.display = 'block'; // Affiche le conteneur des boutons
+    });
+
 
     // Gestion du bouton "Commencer"
     // Ajoutez ce gestionnaire d'événements pour le bouton "Commencer"
