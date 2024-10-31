@@ -11,9 +11,7 @@
             background-color: #f0f0f0;
             color: #333;
             display: flex;
-            flex-direction: column; /* Aligne les éléments en colonne */
-            align-items: center; /* Centre horizontalement */
-            justify-content: center; /* Centre verticalement */
+            align-items: center; /* Centre verticalement */
             height: 100vh; /* Prend toute la hauteur de la fenêtre */
             margin: 0; /* Enlève le margin par défaut */
         }
@@ -27,6 +25,10 @@
             flex-direction: column; /* Aligne le contenu du chat verticalement */
             justify-content: center; /* Centre le contenu verticalement */
             padding: 20px; /* Padding autour du contenu */
+            position: absolute; /* Position absolue */
+            left: 0; /* Aligné à gauche */
+            top: 50%; /* Déplacement vers le bas */
+            transform: translateY(-50%); /* Centre verticalement */
         }
         .chat-container {
             display: block; /* Affiche le conteneur de chat */
@@ -49,7 +51,8 @@
         .button-container {
             display: flex;
             flex-direction: column; /* Aligne le texte et le bouton en colonne */
-            align-items: center; /* Centre le texte et le bouton */
+            align-items: flex-start; /* Aligne à gauche */
+            margin-left: 20px; /* Ajoute un espacement à gauche */
         }
         #fillInTheBlanksBtn {
             padding: 15px 30px;
