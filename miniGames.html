@@ -4,74 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini-jeux</title>
-    <style>
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f5;
-            margin: 0;
-        }
-        #miniGameContainer {
-            text-align: center;
-        }
-        #fillInTheBlanksBtn {
-            padding: 15px 30px;
-            font-size: 1.5em;
-            cursor: pointer;
-            background-color: #4CAF50;
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            transition: background-color 0.3s ease;
-            position: relative;
-        }
-        #fillInTheBlanksBtn:hover {
-            background-color: #45a049;
-        }
 
-        /* Tooltip style */
-        #fillInTheBlanksBtn .tooltip {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            margin-top: 8px;
-            padding: 10px;
-            font-size: 0.9em;
-            color: #333;
-            background-color: #ffffff;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-            width: 250px;
-            text-align: center;
-            z-index: 1;
-        }
-        #fillInTheBlanksBtn:hover .tooltip {
-            display: block;
-        }
-    </style>
-</head>
-<body>
-    <div id="miniGameContainer">
-        <h1>Mini-jeux</h1>
-        
-        <!-- Button with tooltip -->
-        <button id="fillInTheBlanksBtn">Fill in the blanks
-            <span class="tooltip">Complétez le trou dans la phrase puis votez pour la phrase la plus drôle!</span>
-        </button>
-    </div>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
     <script>
-        // Ajoutez ici les fonctionnalités du mini-jeu si nécessaire
-        document.getElementById('fillInTheBlanksBtn').addEventListener('click', () => {
-            alert("Chargement du jeu 'Fill in the blanks' !");
-            // Rediriger ou charger la logique du jeu ici
-        });
+        const firebaseConfig = {
+            apiKey: "AIzaSyDejZmhxJ-wjwJ3-nE2I43vMmhRqgqhcxA",
+            authDomain: "divagame-97e7c.firebaseapp.com",
+            projectId: "divagame-97e7c",
+            storageBucket: "divagame-97e7c.appspot.com",
+            messagingSenderId: "253959990116",
+            appId: "1:253959990116:web:506a1d0cdf752823656871"
+        };
+
+        // Initialise Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        async function displayMessages() {
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.innerHTML = '<h3>Chat</h3>';
+            
+            db.collection('Messages').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+                chatContainer.innerHTML = '<h3>Chat</h3>'; // Réinitialise le contenu
+                snapshot.forEach(doc => {
+                    const messageData = doc.data();
+                    const messageElement = document.createElement('p');
+                    messageElement.innerHTML = `<strong style="color: ${messageData.color || '#000000'};">${messageData.username}:</strong> ${messageData.message}`;
+                    chatContainer.appendChild(messageElement);
+                });
+            });
+        }
+
+        // Appel à la fonction pour afficher les messages lors du chargement de la page
+        displayMessages();
     </script>
+</head>
+<body>
+    <div class="container">
+        <div class="chat-container" id="chatContainer">
+            <h3>Chat</h3>
+            <p>Le chat apparaîtra ici.</p>
+        </div>
+    </div>
 </body>
 </html>
