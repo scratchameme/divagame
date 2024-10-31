@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini-jeux</title>
     <style>
-        /* Style pour le conteneur de mini-jeux */
         body {
             display: flex;
             align-items: center;
@@ -27,21 +26,48 @@
             border: none;
             border-radius: 10px;
             transition: background-color 0.3s ease;
+            position: relative;
         }
         #fillInTheBlanksBtn:hover {
             background-color: #45a049;
+        }
+
+        /* Tooltip style */
+        #fillInTheBlanksBtn .tooltip {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 8px;
+            padding: 10px;
+            font-size: 0.9em;
+            color: #333;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            width: 250px;
+            text-align: center;
+            z-index: 1;
+        }
+        #fillInTheBlanksBtn:hover .tooltip {
+            display: block;
         }
     </style>
 </head>
 <body>
     <div id="miniGameContainer">
         <h1>Mini-jeux</h1>
-        <button id="fillInTheBlanksBtn">Fill in the blanks</button>
+        
+        <!-- Button with tooltip -->
+        <button id="fillInTheBlanksBtn">Fill in the blanks
+            <span class="tooltip">Complétez le trou dans la phrase puis votez pour la phrase la plus drôle!</span>
+        </button>
     </div>
 
     <script>
-        // Ajoutez ici les fonctionnalités du mini-jeu
-
+        // Ajoutez ici les fonctionnalités du mini-jeu si nécessaire
         document.getElementById('fillInTheBlanksBtn').addEventListener('click', () => {
             alert("Chargement du jeu 'Fill in the blanks' !");
             // Rediriger ou charger la logique du jeu ici
