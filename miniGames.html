@@ -96,6 +96,11 @@
     </div>
 
     <script>
+        // Fonction pour rediriger vers FillInTheBlanks.html lorsque le bouton est cliqué
+        document.getElementById('fillInTheBlanksBtn').addEventListener('click', function() {
+            window.location.href = 'FillInTheBlanks.html';
+        });
+
         document.addEventListener("DOMContentLoaded", function() {
             const firebaseConfig = {
                 apiKey: "AIzaSyDejZmhxJ-wjwJ3-nE2I43vMmhRqgqhcxA",
