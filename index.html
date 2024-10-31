@@ -375,7 +375,12 @@
         document.getElementById('selectionContainer').style.display = 'block'; // Affiche le conteneur des boutons
     });
 
+    document.getElementById('miniGamesBtn').addEventListener('click', () => {
+        // Redirige vers le fichier mini-jeux
+        window.location.href = 'miniGames.html';
+    });
 
+    
     // Gestion du bouton "Commencer"
     // Ajoutez ce gestionnaire d'événements pour le bouton "Commencer"
     document.getElementById('startBtn').addEventListener('click', () => {
