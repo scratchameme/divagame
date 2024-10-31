@@ -17,8 +17,8 @@
             margin: 0; /* Enlève le margin par défaut */
         }
         .container {
-            width: 250px; /* Largeur du conteneur */
-            height: 390px; /* Hauteur du conteneur */
+            width: 250px; /* Largeur du conteneur principal */
+            height: 390px; /* Hauteur du conteneur principal */
             position: relative; /* Position relative pour le contenu du chat */
             background: #fff; /* Fond blanc pour le conteneur */
             border-radius: 8px;
@@ -36,6 +36,10 @@
             overflow: auto; /* Permet de faire défiler le contenu si nécessaire */
             background-color: #f0f0f5; /* Couleur de fond du chat */
             position: relative; /* Pour garder le chat à l'intérieur du conteneur */
+        }
+        .button-container {
+            text-align: center; /* Centre le texte du conteneur du bouton */
+            margin-top: 10px; /* Espace au-dessus du conteneur du bouton */
         }
         #fillInTheBlanksBtn {
             padding: 15px 30px;
@@ -60,13 +64,15 @@
 <body>
     <div class="container">
         <h1>Mini-jeux</h1>
-        
-        <!-- Button with tooltip -->
-        <button id="fillInTheBlanksBtn">Fill in the blanks</button>
 
         <div class="chat-container" id="chatContainer">
             <h3>Chat</h3>
             <p>Le chat apparaîtra ici.</p>
+        </div>
+
+        <div class="button-container">
+            <h3>Jeu : Remplissez les blancs</h3>
+            <button id="fillInTheBlanksBtn">Fill in the blanks</button>
         </div>
     </div>
 
