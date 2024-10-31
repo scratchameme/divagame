@@ -25,67 +25,62 @@
             background: #fff; /* Fond blanc pour le conteneur */
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column; /* Pour empiler les éléments verticalement */
+            align-items: center; /* Centrer le contenu horizontalement */
+        }
+        .chat-header {
+            width: 168.67px; /* Largeur du texte "Chat" */
+            height: 28px; /* Hauteur du texte "Chat" */
+            display: flex;
+            justify-content: center; /* Centre le texte horizontalement */
+            align-items: center; /* Centre le texte verticalement */
+            background-color: #007bff; /* Couleur de fond pour l'en-tête */
+            color: white; /* Couleur du texte */
+            border-radius: 8px 8px 0 0; /* Coins arrondis en haut */
+            margin-bottom: 5px; /* Espacement entre l'en-tête et le chat */
         }
         .chat-container {
-            display: none; /* Cacher par défaut */
             width: 190px; /* Largeur du chat */
             height: 350px; /* Hauteur du chat */
-            margin: 20px; /* Espacement autour du chat */
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            overflow-y: auto;
-            background-color: #f0f0f5;
-            position: relative; /* Pour garder le chat à l'intérieur du conteneur */
+            margin-bottom: 10px; /* Espacement sous le chat */
+            border: 1px solid #ccc; /* Bordure du chat */
+            border-radius: 5px; /* Coins arrondis du chat */
+            padding: 10px; /* Espacement à l'intérieur du chat */
+            overflow-y: auto; /* Ajoute un défilement si nécessaire */
+            background-color: #f0f0f5; /* Couleur de fond pour le chat */
         }
     </style>
-
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
     <div class="container">
-        <div class="chat-container" id="chatContainer">
-            <h3>Chat</h3>
-            <p>Le chat apparaîtra ici.</p>
+        <div class="chat-header">Chat</div>
+        <div class="chat-container" id="chat-container">
+            <!-- Les messages seront affichés ici -->
         </div>
-        <!-- Autres contenus de votre page -->
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const firebaseConfig = {
-                apiKey: "AIzaSyDejZmhxJ-wjwJ3-nE2I43vMmhRqgqhcxA",
-                authDomain: "divagame-97e7c.firebaseapp.com",
-                projectId: "divagame-97e7c",
-                storageBucket: "divagame-97e7c.appspot.com",
-                messagingSenderId: "253959990116",
-                appId: "1:253959990116:web:506a1d0cdf752823656871"
-            };
+        // Exemple de fonction pour afficher des messages
+        const chatContainer = document.getElementById('chat-container');
 
-            // Initialise Firebase
-            firebase.initializeApp(firebaseConfig);
-            const db = firebase.firestore();
+        function displayMessages(messages) {
+            chatContainer.innerHTML = ''; // Efface les messages précédents
+            messages.forEach(msg => {
+                const messageElement = document.createElement('div');
+                messageElement.textContent = msg;
+                chatContainer.appendChild(messageElement);
+            });
+        }
 
-            async function displayMessages() {
-                const chatContainer = document.getElementById('chatContainer');
-                chatContainer.style.display = 'block'; // Affiche le conteneur de chat
-                
-                db.collection('Messages').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-                    chatContainer.innerHTML = '<h3>Chat</h3>'; // Réinitialise le contenu
-                    snapshot.forEach(doc => {
-                        const messageData = doc.data();
-                        const messageElement = document.createElement('p');
-                        messageElement.innerHTML = `<strong style="color: ${messageData.color || '#000000'};">${messageData.username}:</strong> ${messageData.message}`;
-                        chatContainer.appendChild(messageElement);
-                    });
-                });
-            }
+        // Exemple d'utilisation
+        const exampleMessages = [
+            'Bonjour!',
+            'Comment ça va?',
+            'Bienvenue dans le chat!'
+        ];
 
-            // Appel à la fonction pour afficher les messages lors du chargement de la page
-            displayMessages();
-        });
+        displayMessages(exampleMessages);
     </script>
 </body>
 </html>
