@@ -1,14 +1,14 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini-jeux</title>
+<body>
+    <div class="container">
+        <div class="chat-container" id="chatContainer">
+            <h3>Chat</h3>
+            <p>Le chat apparaîtra ici.</p>
+        </div>
+    </div>
 
-    <!-- Firebase SDK -->
+    <!-- Scripts Firebase et votre code JavaScript -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDejZmhxJ-wjwJ3-nE2I43vMmhRqgqhcxA",
@@ -41,13 +41,4 @@
         // Appel à la fonction pour afficher les messages lors du chargement de la page
         displayMessages();
     </script>
-</head>
-<body>
-    <div class="container">
-        <div class="chat-container" id="chatContainer">
-            <h3>Chat</h3>
-            <p>Le chat apparaîtra ici.</p>
-        </div>
-    </div>
 </body>
-</html>
