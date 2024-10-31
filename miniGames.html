@@ -29,12 +29,12 @@
         .chat-container {
             display: block; /* Affiche le conteneur de chat */
             width: 190px; /* Largeur du chat */
-            height: 350px; /* Hauteur du chat */
+            max-height: 350px; /* Hauteur maximale du chat */
             margin: 20px; /* Espacement autour du chat */
             border: 1px solid #ccc;
             border-radius: 5px;
             padding: 10px; /* Padding du chat */
-            overflow-y: auto;
+            overflow-y: hidden; /* Cache les barres de défilement */
             background-color: #f0f0f5;
             position: relative; /* Pour garder le chat à l'intérieur du conteneur */
         }
