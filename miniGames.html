@@ -14,6 +14,7 @@
             align-items: center; /* Centre verticalement */
             height: 100vh; /* Prend toute la hauteur de la fenêtre */
             margin: 0; /* Enlève le margin par défaut */
+            flex-direction: column; /* Aligne les éléments en colonne */
         }
         .container {
             width: 250px; /* Largeur du conteneur */
@@ -44,6 +45,24 @@
         .chat-container p {
             margin: 0; /* Enlève l'espacement vertical entre les messages */
         }
+        .button-container {
+            display: flex;
+            justify-content: center; /* Centre le bouton horizontalement */
+            margin-top: 20px; /* Espacement au-dessus du conteneur de bouton */
+        }
+        #fillInTheBlanksBtn {
+            padding: 15px 30px;
+            font-size: 1.5em;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
+        }
+        #fillInTheBlanksBtn:hover {
+            background-color: #45a049;
+        }
     </style>
 
     <!-- Firebase SDK -->
@@ -57,6 +76,10 @@
             <p>Le chat apparaîtra ici.</p>
         </div>
         <!-- Autres contenus de votre page -->
+    </div>
+
+    <div class="button-container">
+        <button id="fillInTheBlanksBtn">Fill in the blanks</button>
     </div>
 
     <script>
