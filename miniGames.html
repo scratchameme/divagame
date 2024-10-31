@@ -1,11 +1,37 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini-jeux</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Assurez-vous de lier votre fichier CSS ici -->
     
+    <!-- Ici vous pouvez coller votre style CSS provenant de index.html -->
+    <style>
+        /* Exemples de styles, remplacez ceci par vos styles réels */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .chat-container {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 20px;
+            height: 300px;
+            overflow-y: scroll;
+            background: #fafafa;
+        }
+        /* Ajoutez tous les autres styles que vous avez dans index.html ici */
+    </style>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -37,7 +63,7 @@
 
             async function displayMessages() {
                 const chatContainer = document.getElementById('chatContainer');
-                chatContainer.innerHTML = '<h3>Chat</h3>';
+                chatContainer.innerHTML = '<h3>Chat</h3>'; // Réinitialise le contenu
                 
                 db.collection('Messages').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
                     chatContainer.innerHTML = '<h3>Chat</h3>'; // Réinitialise le contenu
