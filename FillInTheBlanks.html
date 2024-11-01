@@ -125,19 +125,19 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <div id="role-container">
-        <button class="role-button" id="hostBtn">Hébergeur</button>
-        <button class="role-button" id="playerBtn">Joueur</button>
+    <div id="role-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;">
+        <button class="counter-btn" id="hostBtn">Hébergeur</button>
+        <button class="counter-btn" id="playerBtn">Joueur</button>
     </div>
     
-    <div class="container">
-        <div class="chat-container" id="chatContainer">
+    <div class="container" style="display: none;">
+        <div class="chat-container" id="chatContainer" >
             <h3>Chat</h3>
             <p>Le chat apparaîtra ici.</p>
         </div>
     </div>
     
-    <div id="button-container">
+    <div id="button-container" style="display: none;">
         <h1>Fill in the blanks</h1> <!-- Titre pour le mini-jeu -->
         
         <div class="round-count-display">
