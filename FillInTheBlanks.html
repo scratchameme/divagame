@@ -75,21 +75,21 @@
             display: flex;
             justify-content: center;
             gap: 10px;
-            font-size: 1.2em;
-            padding: 10px;
+            font-size: 2em;
+            padding: 20px;
             margin-top: 20px;
         }
         
         .controls {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 20px;
+            margin-top: 20px;
         }
         
         .counter-btn {
-            padding: 10px 20px;
-            font-size: 1.2em;
+            padding: 20px 40px;
+            font-size: 1.5em;
             background-color: #4CAF50;
             color: white;
             border: none;
@@ -104,9 +104,9 @@
         
         #startBtn {
             display: none; /* Caché par défaut */
-            margin-top: 20px; /* Positionné en bas des autres boutons */
-            padding: 10px 20px;
-            font-size: 1em;
+            margin-top: 30px; /* Positionné en bas des autres boutons */
+            padding: 15px 30px;
+            font-size: 1.5em;
             background-color: #4CAF50;
             color: white;
             border: none;
@@ -209,9 +209,9 @@
             
             document.getElementById('startBtn').onclick = function() {
                 document.querySelector('.round-count-display').innerHTML = `0/${roundCount}`;
+                document.querySelector('.controls').style.display = 'none'; // Cache les boutons de contrôle
+                document.getElementById('startBtn').style.display = 'none'; // Cache le bouton "Commencer"
             };
-
-
             // Appel à la fonction pour afficher les messages lors du chargement de la page
             displayMessages();
         });
