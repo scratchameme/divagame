@@ -123,8 +123,8 @@
             display: flex;
             justify-content: space-between; /* Espace entre les boutons */
             align-items: center; /* Centre les boutons verticalement */
-            width: 80%; /* Largeur du conteneur */
-            max-width: 600px; /* Largeur maximale pour éviter qu'il ne s'étire trop */
+            width: 300px; /* Largeur du conteneur pour que les boutons soient bien espacés */
+            max-width: 80%; /* Largeur maximale pour éviter qu'il ne s'étire trop */
             background-color: #fff; /* Fond blanc */
             border-radius: 8px; /* Coins arrondis */
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Ombre */
@@ -133,6 +133,10 @@
             position: relative; /* Pour positionner correctement dans l'écran */
             top: 50%; /* Positionné au milieu de la page */
             transform: translateY(-50%); /* Centre verticalement */
+        }
+        
+        .counter-btn {
+            margin: 0 5px; /* 5px à gauche et à droite de chaque bouton pour un total de 10px entre les deux */
         }
     </style>
 
