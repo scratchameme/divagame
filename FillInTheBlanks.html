@@ -13,6 +13,8 @@
             display: flex;
             height: 100vh; /* Prend toute la hauteur de la fenêtre */
             margin: 0; /* Enlève le margin par défaut */
+            justify-content: center; /* Centre horizontalement */
+            align-items: center; /* Centre verticalement */
         }
         .container {
             width: 250px; /* Largeur du conteneur */
@@ -118,25 +120,32 @@
         #startBtn:hover {
             background-color: #45a049;
         }
-
+        
         #role-container {
             display: flex;
             justify-content: space-between; /* Espace entre les boutons */
             align-items: center; /* Centre les boutons verticalement */
             width: 300px; /* Largeur du conteneur pour que les boutons soient bien espacés */
-            max-width: 80%; /* Largeur maximale pour éviter qu'il ne s'étire trop */
             background-color: #fff; /* Fond blanc */
             border-radius: 8px; /* Coins arrondis */
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Ombre */
             padding: 20px; /* Espacement intérieur */
-            margin: auto; /* Centre horizontalement */
-            position: relative; /* Pour positionner correctement dans l'écran */
-            top: 50%; /* Positionné au milieu de la page */
-            transform: translateY(-50%); /* Centre verticalement */
         }
         
         .counter-btn {
-            margin: 0 5px; /* 5px à gauche et à droite de chaque bouton pour un total de 10px entre les deux */
+            padding: 20px 20px; /* Padding pour les boutons */
+            font-size: 1.5em;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 0; /* Retire les marges par défaut */
+        }
+        
+        .counter-btn:hover {
+            background-color: #45a049;
         }
     </style>
 
