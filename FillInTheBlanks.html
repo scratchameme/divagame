@@ -208,44 +208,9 @@
             }
             
             document.getElementById('startBtn').onclick = function() {
-                // Met à jour l'affichage pour le nombre de tours
                 document.querySelector('.round-count-display').innerHTML = `0/${roundCount}`;
-                
-                // Cache les boutons de contrôle
-                document.querySelector('.controls').style.display = 'none'; 
-                document.getElementById('startBtn').style.display = 'none'; 
-            
-                // Remplace le contenu du chat par la nouvelle zone de texte et bouton
-                window.opener.document.getElementById('chatContainer').innerHTML = `
-                    <h3>Finir la phrase</h3>
-                    <input type="text" id="finishPhraseInput" placeholder="Finir la phrase ici..." />
-                    <button id="confirmBtn">Confirmer</button>
-                `;
-            
-                // Ajoute l'événement pour le bouton "Confirmer"
-                // Dans la section "document.addEventListener("DOMContentLoaded", function() {", juste après "displayMessages();"
-                document.getElementById('confirmBtn').onclick = function() {
-                    const finishPhrase = document.getElementById('finishPhraseInput').value;
-                
-                    if (finishPhrase) {
-                        // Sauvegarde la phrase dans Firestore
-                        const db = firebase.firestore();
-                        const playerName = "NomDuJoueur"; // Remplacez par la logique pour obtenir le nom du joueur
-                
-                        db.collection('Phrases').add({
-                            phrase: finishPhrase,
-                            player: playerName,
-                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                        }).then(() => {
-                            // Réinitialise l'input
-                            document.getElementById('finishPhraseInput').value = '';
-                            alert("Phrase sauvegardée !");
-                        }).catch((error) => {
-                            console.error("Erreur lors de la sauvegarde de la phrase: ", error);
-                            alert("Erreur lors de la sauvegarde de la phrase. Veuillez réessayer.");
-                        });
-                    }
-                };
+                document.querySelector('.controls').style.display = 'none'; // Cache les boutons de contrôle
+                document.getElementById('startBtn').style.display = 'none'; // Cache le bouton "Commencer"
             };
             // Appel à la fonction pour afficher les messages lors du chargement de la page
             displayMessages();
