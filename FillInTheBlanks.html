@@ -47,16 +47,22 @@
         .chat-container p {
             margin: 0; /* Enlève l'espacement vertical entre les messages */
         }
-        .button-container {
+        /* Styles pour le conteneur centré */
+        #button-container {
             background-color: #fff; /* Fond blanc */
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            width: 300px; /* Ajuste la largeur selon vos besoins */
+            width: 800px; /* Largeur du conteneur */
+            height: 500px;
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
         
         h1 {
