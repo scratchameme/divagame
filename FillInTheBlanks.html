@@ -223,21 +223,22 @@
                 `;
             
                 // Ajoute l'événement pour le bouton "Confirmer"
-                window.opener.document.getElementById('confirmBtn').onclick = function() {
-                    const finishPhrase = window.opener.document.getElementById('finishPhraseInput').value;
-            
+                // Dans la section "document.addEventListener("DOMContentLoaded", function() {", juste après "displayMessages();"
+                document.getElementById('confirmBtn').onclick = function() {
+                    const finishPhrase = document.getElementById('finishPhraseInput').value;
+                
                     if (finishPhrase) {
                         // Sauvegarde la phrase dans Firestore
                         const db = firebase.firestore();
                         const playerName = "NomDuJoueur"; // Remplacez par la logique pour obtenir le nom du joueur
-            
+                
                         db.collection('Phrases').add({
                             phrase: finishPhrase,
                             player: playerName,
                             timestamp: firebase.firestore.FieldValue.serverTimestamp()
                         }).then(() => {
                             // Réinitialise l'input
-                            window.opener.document.getElementById('finishPhraseInput').value = '';
+                            document.getElementById('finishPhraseInput').value = '';
                             alert("Phrase sauvegardée !");
                         }).catch((error) => {
                             console.error("Erreur lors de la sauvegarde de la phrase: ", error);
