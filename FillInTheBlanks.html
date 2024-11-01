@@ -64,6 +64,25 @@
             margin-bottom: 20px; /* Espacement au-dessous du titre */
             text-align: center; /* Centre le texte */
         }
+        .round-count-display {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        #startBtn {
+            display: none; /* Caché par défaut */
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+        }
     </style>
 
     <!-- Firebase SDK -->
@@ -80,6 +99,16 @@
 
     <div class="button-container">
         <h1>Fill in the blanks</h1> <!-- Titre pour le jeu -->
+            <div class="round-count-display">
+                <span>Nombre de tours:</span>
+                <span id="roundCount">0</span>
+            </div>
+            <div class="controls">
+                <button class="counter-btn" id="decreaseBtn">-</button>
+                <button class="counter-btn" id="increaseBtn">+</button>
+            </div>
+            <button id="startBtn">Commencer</button>
+        </div>
     </div>
 
     <script>
@@ -123,6 +152,27 @@
                     console.log('Message le plus ancien supprimé pour respecter la limite.');
                 }
             }
+
+            let roundCount = 0;
+
+            document.getElementById('increaseBtn').onclick = function() {
+                roundCount++;
+                updateDisplay();
+            };
+            
+            document.getElementById('decreaseBtn').onclick = function() {
+                if (roundCount > 0) roundCount--;
+                updateDisplay();
+            };
+            
+            function updateDisplay() {
+                document.getElementById('roundCount').textContent = roundCount;
+                document.getElementById('startBtn').style.display = roundCount > 0 ? 'block' : 'none';
+            }
+            
+            document.getElementById('startBtn').onclick = function() {
+                document.querySelector('.round-count-display').innerHTML = `0/${roundCount}`;
+            };
 
             // Appel à la fonction pour afficher les messages lors du chargement de la page
             displayMessages();
