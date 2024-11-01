@@ -69,20 +69,49 @@
             justify-content: center;
             gap: 10px;
             font-size: 1.2em;
+            background-color: #f0f0f5; /* Même couleur d'arrière-plan que le conteneur de chat */
+            padding: 10px;
+            border-radius: 5px;
             margin-top: 20px;
+            text-align: center;
         }
+        
         .controls {
             display: flex;
+            justify-content: center;
             gap: 10px;
             margin-top: 10px;
         }
+        
+        .counter-btn {
+            padding: 10px 20px;
+            font-size: 1.2em;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .counter-btn:hover {
+            background-color: #45a049;
+        }
+        
         #startBtn {
             display: none; /* Caché par défaut */
             margin-top: 20px;
             padding: 10px 20px;
             font-size: 1em;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
+        #startBtn:hover {
+            background-color: #45a049;
+}
     </style>
 
     <!-- Firebase SDK -->
