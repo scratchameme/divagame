@@ -72,15 +72,17 @@
             background-color: #45a049;
         }
         #fillInTheBlanksBtn {
-    position: relative; /* Nécessaire pour positionner la tooltip */
+            position: relative; /* Pour positionner la tooltip par rapport au bouton */
         }
         
         .tooltip {
-            display: none; /* Masque la tooltip par défaut */
+            display: block;
+            opacity: 0; /* Départ de l'opacité à 0 pour l'animation */
             position: absolute;
-            bottom: -45px; /* Positionne la tooltip en dessous du bouton */
+            top: 110%; /* Positionne la tooltip en dessous du bouton */
             left: 50%;
             transform: translateX(-50%);
+            margin-top: 8px;
             padding: 10px;
             font-size: 0.9em;
             color: #333;
@@ -91,10 +93,12 @@
             width: 250px;
             text-align: center;
             z-index: 1;
+            transition: opacity 0.3s ease, transform 0.3s ease; /* Animation progressive */
         }
         
         #fillInTheBlanksBtn:hover .tooltip {
-            display: block; /* Affiche la tooltip au survol */
+            opacity: 1; /* Fait apparaître progressivement */
+            transform: translateX(-50%) translateY(0); /* Ajuste la position finale */
         }
         h1 {
             font-size: 2em; /* Taille de la police pour le titre */
