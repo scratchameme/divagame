@@ -48,32 +48,30 @@
             margin: 0; /* Enlève l'espacement vertical entre les messages */
         }
         .button-container {
+            background-color: #fff; /* Fond blanc */
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 300px; /* Ajuste la largeur selon vos besoins */
             display: flex;
-            justify-content: center; /* Centre le texte horizontalement */
-            align-items: center; /* Centre le texte verticalement */
-            height: 100vh; /* Prend toute la hauteur de la fenêtre */
-            position: absolute; /* Position absolue */
-            top: 0; /* Aligné en haut */
-            left: 50%; /* Centre horizontalement */
-            transform: translateX(-50%); /* Ajustement du centre */
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
         }
+        
         h1 {
             font-size: 2em; /* Taille de la police pour le titre */
             font-weight: bold; /* Met le texte en gras */
-            margin: 0; /* Enlève le margin par défaut */
-            margin-bottom: 20px; /* Espacement au-dessous du titre */
-            text-align: center; /* Centre le texte */
+            margin-bottom: 20px; /* Espacement en dessous */
         }
+        
         .round-count-display {
             display: flex;
             justify-content: center;
             gap: 10px;
             font-size: 1.2em;
-            background-color: #f0f0f5; /* Même couleur d'arrière-plan que le conteneur de chat */
             padding: 10px;
-            border-radius: 5px;
             margin-top: 20px;
-            text-align: center;
         }
         
         .controls {
@@ -93,13 +91,14 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
+        
         .counter-btn:hover {
             background-color: #45a049;
         }
         
         #startBtn {
             display: none; /* Caché par défaut */
-            margin-top: 20px;
+            margin-top: 20px; /* Positionné en bas des autres boutons */
             padding: 10px 20px;
             font-size: 1em;
             background-color: #4CAF50;
@@ -109,9 +108,10 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
+        
         #startBtn:hover {
             background-color: #45a049;
-}
+        }
     </style>
 
     <!-- Firebase SDK -->
@@ -125,19 +125,21 @@
             <p>Le chat apparaîtra ici.</p>
         </div>
     </div>
-
-    <div class="button-container">
-        <h1>Fill in the blanks</h1> <!-- Titre pour le jeu -->
-            <div class="round-count-display">
-                <span>Nombre de tours:</span>
-                <span id="roundCount">0</span>
-            </div>
-            <div class="controls">
-                <button class="counter-btn" id="decreaseBtn">-</button>
-                <button class="counter-btn" id="increaseBtn">+</button>
-            </div>
-            <button id="startBtn">Commencer</button>
+    
+    <div id="button-container">
+        <h1>Fill in the blanks</h1> <!-- Titre pour le mini-jeu -->
+        
+        <div class="round-count-display">
+            <span>Nombre de tours:</span>
+            <span id="roundCount">0</span>
         </div>
+    
+        <div class="controls">
+            <button class="counter-btn" id="decreaseBtn">-</button>
+            <button class="counter-btn" id="increaseBtn">+</button>
+        </div>
+    
+        <button id="startBtn">Commencer</button> <!-- Bouton "Commencer" -->
     </div>
 
     <script>
@@ -183,7 +185,7 @@
             }
 
             let roundCount = 0;
-
+            
             document.getElementById('increaseBtn').onclick = function() {
                 roundCount++;
                 updateDisplay();
@@ -202,6 +204,7 @@
             document.getElementById('startBtn').onclick = function() {
                 document.querySelector('.round-count-display').innerHTML = `0/${roundCount}`;
             };
+
 
             // Appel à la fonction pour afficher les messages lors du chargement de la page
             displayMessages();
