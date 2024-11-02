@@ -356,13 +356,15 @@
                         // Ajout des événements pour les boutons de rôle
             document.getElementById('hostBtn').onclick = function() {
                 document.getElementById('role-container').style.display = 'none'; // Cache les boutons de rôle
-                document.querySelector('.container').style.display = 'flex'; // Affiche le conteneur
+                document.querySelector('.container').style.display = 'flex'; // Affiche le conteneur principal
                 document.getElementById('button-container').style.display = 'flex'; // Affiche le conteneur des boutons
+                document.getElementById('chatContainer').style.display = 'block'; // Assurez-vous que le chat est visible
             };
             
             document.getElementById('playerBtn').onclick = async function() {
                 document.getElementById('role-container').style.display = 'none'; // Cache les boutons de rôle
-            
+                document.querySelector('.container').style.display = 'flex'; // Affiche le conteneur principal
+                
                 // Sélectionnez le conteneur pour les boutons de joueur
                 const playerButtonContainer = document.getElementById('playerButtonContainer');
                 playerButtonContainer.innerHTML = ""; // Effacer tout contenu précédent
@@ -400,7 +402,7 @@
                             document.getElementById('finalPlayersListContainer').style.display = 'block';
             
                             // Affichez le conteneur de chat
-                            document.getElementById('chatContainer').style.display = 'block';
+                            document.getElementById('chatContainer').style.display = 'block'; // Assurez-vous que le chat est visible
                         });
             
                         // Ajoutez le bouton au conteneur
