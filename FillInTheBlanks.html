@@ -215,11 +215,68 @@
             <button class="counter-btn" id="decreaseBtn">-</button>
             <button class="counter-btn" id="increaseBtn">+</button>
         </div>
+            <div id="finalPlayersListContainer" style="display: none;">
+            <h3>Nom du joueur :</h3>
+            <p id="playerName"></p>
+            <p id="playerColor" style="color: #000000;"></p>
+
+            <!-- Zone de message et bouton envoyer -->
+            <div class="message-input">
+                <input type="text" id="playerMessage" placeholder="Tapez votre message">
+                <button id="sendMessageBtn">Envoyer</button>
+            </div>
+        </div>
     
         <button id="startBtn">Commencer</button> <!-- Bouton "Commencer" -->
     </div>
 
     <script>
+            const db = firebase.firestore(); // Assurez-vous que Firebase est initialisé
+
+        function saveMessageToFirestore(message) {
+            try {
+                if (currentPlayerUsername && message) {
+                    const color = document.getElementById('playerColor').style.color;
+                    db.collection('Messages').add({
+                        username: currentPlayerUsername,
+                        message: message,
+                        color: color,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    console.log('Message sauvegardé dans Firestore :', message);
+                }
+            } catch (error) {
+                console.error('Erreur lors de la sauvegarde du message:', error);
+            }
+        }
+    
+        document.querySelectorAll('.playerBtn').forEach(button => {
+            button.addEventListener('click', function() {
+                const username = this.getAttribute('data-username');
+                const color = this.getAttribute('data-color');
+    
+                // Cacher le contenu existant
+                document.querySelector('.main-container').style.display = 'none';
+                document.getElementById('chatContainer').style.display = 'block'; // Assurez-vous que le chat est visible
+    
+                // Afficher le nom et la couleur du joueur
+                document.getElementById('playerName').textContent = username;
+                document.getElementById('playerColor').textContent = `Couleur: ${color}`;
+                document.getElementById('playerColor').style.color = color; // Appliquer la couleur
+    
+                // Afficher le conteneur des informations du joueur
+                document.getElementById('finalPlayersListContainer').style.display = 'block';
+            });
+        });
+    
+        document.getElementById('sendMessageBtn').addEventListener('click', () => {
+            const message = document.getElementById('playerMessage').value;
+            if (message) {
+                saveMessageToFirestore(message);
+                document.getElementById('playerMessage').value = '';
+            }
+        });
+        
         document.addEventListener("DOMContentLoaded", function() {
             const firebaseConfig = {
                 apiKey: "AIzaSyDejZmhxJ-wjwJ3-nE2I43vMmhRqgqhcxA",
