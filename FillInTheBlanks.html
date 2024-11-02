@@ -258,6 +258,7 @@
             
             document.getElementById('playerBtn').onclick = async function() {
                 document.getElementById('role-container').style.display = 'none'; // Cache les boutons de rôle
+                document.getElementById('button-container').style.display = 'block'; // Affiche le conteneur des boutons
                 
                 // Sélectionnez le conteneur pour les boutons de joueur
                 const playerButtonContainer = document.getElementById('playerButtonContainer');
@@ -272,26 +273,26 @@
                         const playerData = doc.data();
                         console.log("Données du joueur récupérées :", playerData);
             
-                        // Utilisez le champ "username" au lieu de "nom"
-                        if (playerData.username) {
+                        // Utilisez le champ "username" et "color"
+                        if (playerData.username && playerData.color) {
                             // Créez un bouton pour chaque joueur
                             const playerButton = document.createElement('button');
                             playerButton.innerText = playerData.username; // Utilisation de username
                             playerButton.className = "counter-btn";
-                            
+            
+                            // Définir la couleur du texte du bouton
+                            playerButton.style.color = playerData.color; // Appliquez la couleur
+            
                             // Ajoutez le bouton au conteneur
                             playerButtonContainer.appendChild(playerButton);
                         } else {
-                            console.warn("Le champ 'username' est manquant pour le document :", doc.id);
+                            console.warn("Le champ 'username' ou 'color' est manquant pour le document :", doc.id);
                         }
                     });
                 } catch (error) {
                     console.error("Erreur lors de la récupération des joueurs :", error);
                 }
             };
-
-            // Appel à la fonction pour afficher les messages lors du chargement de la page
-            displayMessages();
         });
     </script>
 </body>
