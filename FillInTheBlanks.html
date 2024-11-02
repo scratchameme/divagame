@@ -214,37 +214,44 @@
                     await enforceMessageLimit();
                 });
             }
-
-            async function displayPlayers() {
-                console.log("Fonction displayPlayers appelée"); // Vérifie que la fonction est bien appelée
+            document.getElementById('playerBtn').onclick = async function() {
+                document.getElementById('role-container').style.display = 'none'; // Cache les boutons de rôle
+                document.getElementById('button-container').style.display = 'block'; // Affiche le conteneur des boutons
             
-                const buttonContainer = document.getElementById('button-container');
-                buttonContainer.innerHTML = ''; // Efface le contenu actuel du conteneur
-                console.log("Conteneur des boutons effacé");
+                console.log("Bouton Joueur cliqué. Tentative de récupération des joueurs...");
+            
+                // Efface le contenu actuel du conteneur des boutons de joueurs
+                playerButtonContainer.innerHTML = "";
             
                 try {
-                    const playersSnapshot = await db.collection('Joueurs').get(); // Récupère les joueurs
-                    console.log("Données récupérées depuis la collection 'Joueurs'", playersSnapshot);
+                    const querySnapshot = await db.collection('Joueurs').get();
+                    console.log("Nombre de joueurs récupérés :", querySnapshot.size);
             
-                    if (playersSnapshot.empty) {
-                        console.log("Aucun joueur trouvé dans la collection 'Joueurs'");
-                    } else {
-                        playersSnapshot.forEach(doc => {
-                            const playerData = doc.data();
-                            console.log("Données du joueur récupérées :", playerData); // Affiche les données de chaque joueur
+                    querySnapshot.forEach((doc) => {
+                        const playerData = doc.data();
+                        console.log("Données du joueur récupérées :", playerData);
             
+                        if (playerData.nom) {
+                            // Crée un bouton pour chaque joueur
                             const playerButton = document.createElement('button');
-                            playerButton.classList.add('counter-btn');
-                            playerButton.textContent = playerData.nom; // Assigne le nom du joueur au bouton
-                            buttonContainer.appendChild(playerButton); // Ajoute le bouton au conteneur
-                            console.log("Bouton créé pour le joueur :", playerData.nom);
-                        });
-                    }
+                            
+                            // Assigner le nom du joueur au texte du bouton
+                            playerButton.innerText = playerData.nom; // Utilisation de innerText
+                            playerButton.className = "counter-btn";
+            
+                            // Debug : Vérifions ce que contient `playerButton.innerText`
+                            console.log(`Texte assigné au bouton : ${playerButton.innerText}`);
+            
+                            // Ajoute le bouton au conteneur
+                            playerButtonContainer.appendChild(playerButton);
+                        } else {
+                            console.warn("Le champ 'nom' est manquant pour le document :", doc.id);
+                        }
+                    });
                 } catch (error) {
-                    console.error("Erreur lors de la récupération des joueurs :", error); // Enregistre les erreurs dans la console
+                    console.error("Erreur lors de la récupération des joueurs :", error);
                 }
-            }
-
+            };
 
             async function enforceMessageLimit() {
                 const messagesSnapshot = await db.collection('Messages').orderBy('timestamp').get();
