@@ -147,6 +147,18 @@
         .counter-btn:hover {
             background-color: #45a049;
         }
+        #playerButtonContainer {
+            display: flex;
+            flex-direction: column; /* Afficher les boutons sous forme de colonne */
+            gap: 10px; /* Espacement entre les boutons */
+            background-color: #fff; /* Fond blanc */
+            padding: 20px; /* Padding autour du conteneur */
+            border-radius: 8px; /* Coins arrondis */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Ombre */
+            width: 300px; /* Largeur fixe pour le conteneur */
+            max-height: 400px; /* Hauteur maximale pour le conteneur */
+            overflow-y: auto; /* Barres de défilement verticales si nécessaire */
+        }
     </style>
 
     <!-- Firebase SDK -->
@@ -258,15 +270,17 @@
             
             document.getElementById('playerBtn').onclick = async function() {
                 document.getElementById('role-container').style.display = 'none'; // Cache les boutons de rôle
-                
+            
                 // Sélectionnez le conteneur pour les boutons de joueur
                 const playerButtonContainer = document.getElementById('playerButtonContainer');
-                playerButtonContainer.style.display = 'block'; // Rendre le conteneur visible
                 playerButtonContainer.innerHTML = ""; // Effacer tout contenu précédent
             
                 try {
                     const querySnapshot = await db.collection('Joueurs').get();
                     console.log("Nombre de joueurs récupérés :", querySnapshot.size);
+            
+                    // Afficher le conteneur des boutons
+                    playerButtonContainer.style.display = 'block'; // Affiche le conteneur des boutons
             
                     querySnapshot.forEach((doc) => {
                         const playerData = doc.data();
