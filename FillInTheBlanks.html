@@ -258,12 +258,11 @@
             
             document.getElementById('playerBtn').onclick = async function() {
                 document.getElementById('role-container').style.display = 'none'; // Cache les boutons de rôle
-                document.getElementById('button-container').style.display = 'block'; // Affiche le conteneur des boutons
-            
-                console.log("Bouton Joueur cliqué. Tentative de récupération des joueurs...");
-            
-                // Efface le contenu actuel du conteneur des boutons de joueurs
-                playerButtonContainer.innerHTML = "";
+                
+                // Sélectionnez le conteneur pour les boutons de joueur
+                const playerButtonContainer = document.getElementById('playerButtonContainer');
+                playerButtonContainer.style.display = 'block'; // Rendre le conteneur visible
+                playerButtonContainer.innerHTML = ""; // Effacer tout contenu précédent
             
                 try {
                     const querySnapshot = await db.collection('Joueurs').get();
@@ -273,21 +272,17 @@
                         const playerData = doc.data();
                         console.log("Données du joueur récupérées :", playerData);
             
-                        if (playerData.nom) {
-                            // Crée un bouton pour chaque joueur
+                        // Utilisez le champ "username" au lieu de "nom"
+                        if (playerData.username) {
+                            // Créez un bouton pour chaque joueur
                             const playerButton = document.createElement('button');
-                            
-                            // Assigner le nom du joueur au texte du bouton
-                            playerButton.innerText = playerData.nom; // Utilisation de innerText
+                            playerButton.innerText = playerData.username; // Utilisation de username
                             playerButton.className = "counter-btn";
-            
-                            // Debug : Vérifions ce que contient `playerButton.innerText`
-                            console.log(`Texte assigné au bouton : ${playerButton.innerText}`);
-            
-                            // Ajoute le bouton au conteneur
+                            
+                            // Ajoutez le bouton au conteneur
                             playerButtonContainer.appendChild(playerButton);
                         } else {
-                            console.warn("Le champ 'nom' est manquant pour le document :", doc.id);
+                            console.warn("Le champ 'username' est manquant pour le document :", doc.id);
                         }
                     });
                 } catch (error) {
