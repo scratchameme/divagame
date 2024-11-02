@@ -147,6 +147,7 @@
         .counter-btn:hover {
             background-color: #45a049;
         }
+        /* Conteneur pour les boutons des joueurs */
         #playerButtonContainer {
             display: flex;
             flex-direction: column; /* Affiche les boutons sous forme de colonne */
@@ -159,7 +160,11 @@
             max-height: 500px; /* Hauteur maximale pour le conteneur */
             overflow-y: auto; /* Barres de défilement verticales si nécessaire */
             align-items: center; /* Centre les boutons horizontalement */
+            justify-content: center; /* Centre les boutons verticalement */
+            height: 100%; /* Permet au conteneur d'occuper toute la hauteur disponible */
         }
+        
+        /* Style des boutons des joueurs avec la classe counter-btn2 */
         .counter-btn2 {
             padding: 15px; /* Padding augmenté pour les boutons */
             font-size: 1.2em; /* Taille de police augmentée */
