@@ -215,6 +215,21 @@
                 });
             }
 
+            async function displayPlayers() {
+                const buttonContainer = document.getElementById('button-container');
+                buttonContainer.innerHTML = ''; // Efface le contenu actuel du conteneur
+            
+                const playersSnapshot = await db.collection('Joueurs').get(); // Récupère les joueurs
+            
+                playersSnapshot.forEach(doc => {
+                    const playerData = doc.data();
+                    const playerButton = document.createElement('button');
+                    playerButton.classList.add('counter-btn');
+                    playerButton.textContent = playerData.nom; // Assigne le nom du joueur au bouton
+                    buttonContainer.appendChild(playerButton); // Ajoute le bouton au conteneur
+                });
+            }
+
             async function enforceMessageLimit() {
                 const messagesSnapshot = await db.collection('Messages').orderBy('timestamp').get();
                 if (messagesSnapshot.size > 13) {
@@ -258,6 +273,7 @@
                 document.getElementById('role-container').style.display = 'none'; // Cache les boutons de rôle
                 document.querySelector('.container').style.display = 'none'; // Cache le conteneur
                 document.getElementById('button-container').style.display = 'none'; // Cache le conteneur des boutons
+                displayPlayers(); // Appelle la fonction pour afficher les boutons des joueurs
             };
             // Appel à la fonction pour afficher les messages lors du chargement de la page
             displayMessages();
