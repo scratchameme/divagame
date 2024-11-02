@@ -366,21 +366,33 @@
                         const playerData = doc.data();
                         console.log("Données du joueur récupérées :", playerData);
             
-                        // Utilisez le champ "username" et "color"
-                        if (playerData.username && playerData.color) {
-                            // Créez un bouton pour chaque joueur
-                            const playerButton = document.createElement('button');
-                            playerButton.innerText = playerData.username; // Utilisation de username
-                            playerButton.className = "counter-btn2";
+                        // Créez un bouton pour chaque joueur
+                        const playerButton = document.createElement('button');
+                        playerButton.innerText = playerData.username; // Utilisation de username
+                        playerButton.className = "counter-btn2";
             
-                            // Définir la couleur du texte du bouton
-                            playerButton.style.color = playerData.color; // Appliquez la couleur
+                        // Définir la couleur du texte du bouton
+                        playerButton.style.color = playerData.color; // Appliquez la couleur
             
-                            // Ajoutez le bouton au conteneur
-                            playerButtonContainer.appendChild(playerButton);
-                        } else {
-                            console.warn("Le champ 'username' ou 'color' est manquant pour le document :", doc.id);
-                        }
+                        // Ajoutez un gestionnaire d'événements pour le clic
+                        playerButton.addEventListener('click', function() {
+                            const username = playerData.username;
+                            const color = playerData.color;
+            
+                            // Affichez le nom et la couleur du joueur
+                            document.getElementById('playerName').textContent = username;
+                            document.getElementById('playerColor').textContent = `Couleur: ${color}`;
+                            document.getElementById('playerColor').style.color = color; // Appliquer la couleur
+                            
+                            // Afficher le conteneur des informations du joueur
+                            document.getElementById('finalPlayersListContainer').style.display = 'block';
+            
+                            // Affichez le conteneur de chat
+                            document.getElementById('chatContainer').style.display = 'block';
+                        });
+            
+                        // Ajoutez le bouton au conteneur
+                        playerButtonContainer.appendChild(playerButton);
                     });
                 } catch (error) {
                     console.error("Erreur lors de la récupération des joueurs :", error);
