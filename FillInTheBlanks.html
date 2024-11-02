@@ -216,19 +216,35 @@
             }
 
             async function displayPlayers() {
+                console.log("Fonction displayPlayers appelée"); // Vérifie que la fonction est bien appelée
+            
                 const buttonContainer = document.getElementById('button-container');
                 buttonContainer.innerHTML = ''; // Efface le contenu actuel du conteneur
+                console.log("Conteneur des boutons effacé");
             
-                const playersSnapshot = await db.collection('Joueurs').get(); // Récupère les joueurs
+                try {
+                    const playersSnapshot = await db.collection('Joueurs').get(); // Récupère les joueurs
+                    console.log("Données récupérées depuis la collection 'Joueurs'", playersSnapshot);
             
-                playersSnapshot.forEach(doc => {
-                    const playerData = doc.data();
-                    const playerButton = document.createElement('button');
-                    playerButton.classList.add('counter-btn');
-                    playerButton.textContent = playerData.nom; // Assigne le nom du joueur au bouton
-                    buttonContainer.appendChild(playerButton); // Ajoute le bouton au conteneur
-                });
+                    if (playersSnapshot.empty) {
+                        console.log("Aucun joueur trouvé dans la collection 'Joueurs'");
+                    } else {
+                        playersSnapshot.forEach(doc => {
+                            const playerData = doc.data();
+                            console.log("Données du joueur récupérées :", playerData); // Affiche les données de chaque joueur
+            
+                            const playerButton = document.createElement('button');
+                            playerButton.classList.add('counter-btn');
+                            playerButton.textContent = playerData.nom; // Assigne le nom du joueur au bouton
+                            buttonContainer.appendChild(playerButton); // Ajoute le bouton au conteneur
+                            console.log("Bouton créé pour le joueur :", playerData.nom);
+                        });
+                    }
+                } catch (error) {
+                    console.error("Erreur lors de la récupération des joueurs :", error); // Enregistre les erreurs dans la console
+                }
             }
+
 
             async function enforceMessageLimit() {
                 const messagesSnapshot = await db.collection('Messages').orderBy('timestamp').get();
@@ -270,11 +286,15 @@
             };
             
             document.getElementById('playerBtn').onclick = function() {
+                console.log("Bouton 'Joueur' cliqué");
                 document.getElementById('role-container').style.display = 'none'; // Cache les boutons de rôle
                 document.querySelector('.container').style.display = 'none'; // Cache le conteneur
-                document.getElementById('button-container').style.display = 'none'; // Cache le conteneur des boutons
+                document.getElementById('button-container').style.display = 'flex'; // Affiche le conteneur des boutons
+                console.log("Conteneur des boutons de joueur affiché");
+            
                 displayPlayers(); // Appelle la fonction pour afficher les boutons des joueurs
             };
+
             // Appel à la fonction pour afficher les messages lors du chargement de la page
             displayMessages();
         });
