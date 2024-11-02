@@ -150,14 +150,29 @@
         #playerButtonContainer {
             display: flex;
             flex-direction: column; /* Afficher les boutons sous forme de colonne */
-            gap: 10px; /* Espacement entre les boutons */
+            gap: 15px; /* Espacement entre les boutons (augmenté) */
             background-color: #fff; /* Fond blanc */
             padding: 20px; /* Padding autour du conteneur */
             border-radius: 8px; /* Coins arrondis */
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Ombre */
-            width: 300px; /* Largeur fixe pour le conteneur */
-            max-height: 400px; /* Hauteur maximale pour le conteneur */
+            width: 350px; /* Largeur augmentée pour le conteneur */
+            max-height: 500px; /* Hauteur maximale pour le conteneur (augmentée) */
             overflow-y: auto; /* Barres de défilement verticales si nécessaire */
+        }
+        
+        .counter-btn {
+            padding: 15px; /* Padding augmenté pour les boutons */
+            font-size: 1.2em; /* Taille de police augmentée */
+            background-color: #4CAF50; /* Couleur de fond des boutons */
+            color: white; /* Couleur du texte (peut être modifié plus tard) */
+            border: none; /* Aucune bordure */
+            border-radius: 5px; /* Coins arrondis */
+            cursor: pointer; /* Curseur en forme de main */
+            transition: background-color 0.3s ease; /* Transition pour le survol */
+        }
+        
+        .counter-btn:hover {
+            background-color: #45a049; /* Couleur au survol */
         }
     </style>
 
