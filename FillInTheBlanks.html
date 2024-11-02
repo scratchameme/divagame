@@ -157,7 +157,6 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Ombre */
             width: 350px; /* Largeur pour le conteneur */
             max-height: 500px; /* Hauteur maximale pour le conteneur */
-            overflow-y: auto; /* Barres de défilement verticales si nécessaire */
         }
         
         .counter-btn2 {
@@ -172,6 +171,11 @@
             width: 210px; /* Largeur des boutons */
             height: 100px; /* Hauteur des boutons */
             margin: 0 auto; /* Centre les boutons dans le conteneur */
+            margin-bottom: 15px; /* Espacement en bas de chaque bouton */
+        }
+                /* Ajout d'un espacement horizontal entre les boutons */
+        .counter-btn2:not(:last-child) {
+            margin-right: 15px; /* Espacement à droite de chaque bouton sauf le dernier */
         }
     </style>
 
