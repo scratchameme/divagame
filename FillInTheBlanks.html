@@ -149,16 +149,17 @@
         }
         #playerButtonContainer {
             display: flex;
-            flex-direction: column; /* Afficher les boutons sous forme de colonne */
-            gap: 15px; /* Espacement entre les boutons (augmenté) */
+            flex-direction: column; /* Affiche les boutons sous forme de colonne */
+            gap: 15px; /* Espacement entre les boutons */
             background-color: #fff; /* Fond blanc */
             padding: 20px; /* Padding autour du conteneur */
             border-radius: 8px; /* Coins arrondis */
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Ombre */
-            width: 350px; /* Largeur pour le conteneur */
+            width: 210px; /* Largeur augmentée pour le conteneur */
             max-height: 500px; /* Hauteur maximale pour le conteneur */
+            overflow-y: auto; /* Barres de défilement verticales si nécessaire */
+            align-items: center; /* Centre les boutons horizontalement */
         }
-        
         .counter-btn2 {
             padding: 15px; /* Padding augmenté pour les boutons */
             font-size: 1.2em; /* Taille de police augmentée */
