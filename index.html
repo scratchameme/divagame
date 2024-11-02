@@ -131,6 +131,10 @@
                 <input type="text" id="playerMessage" placeholder="Tapez votre message">
                 <button id="sendMessageBtn">Envoyer</button>
             </div>
+            <!-- Bouton Fill In The Blanks -->
+            <div class="fill-in-the-blanks-container" style="text-align: center; margin-top: 10px;">
+                <button id="fillInTheBlanksBtn">Fill In The Blanks</button>
+            </div>
         </div>
     </div>
 </div>
@@ -351,6 +355,12 @@
         // Redirige vers le fichier mini-jeux
         window.location.href = 'miniGames.html';
     });
+
+    // Redirection vers FillInTheBlanks.html lors du clic sur le bouton "Fill In The Blanks"
+    document.getElementById('fillInTheBlanksBtn').addEventListener('click', () => {
+        window.location.href = 'FillInTheBlanks.html';
+    });
+    
 
         // Ajoutez ce gestionnaire d'événements pour le bouton "Commencer"
     document.getElementById('startBtn').addEventListener('click', () => {
